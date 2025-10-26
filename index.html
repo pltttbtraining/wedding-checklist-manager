@@ -1,744 +1,209 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Wedding Checklist Manager — Modern</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <style>
-    :root{
-      --bg1: #fbf9ff;
-      --glass: rgba(255,255,255,0.6);
-      --accent: #6b5cff;
-      --accent-2: #5cc8ff;
-      --muted: #8b8b9a;
-      --card-radius: 16px;
-      --glass-blur: 12px;
-      --shadow-1: 0 8px 30px rgba(12,12,30,0.06);
-      --success: #16a34a;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-      background: linear-gradient(180deg,#fffefe 0%, #fff7fb 100%);
-      color:#0f172a;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .container-app{max-width:760px;margin:0 auto;padding:18px}
-
-    /* GLASS header */
-    .hdr {
-      display:flex; gap:12px; align-items:center; padding:14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(250,248,255,0.6));
-      border-radius: 14px; box-shadow: var(--shadow-1); border:1px solid rgba(0,0,0,0.04);
-      backdrop-filter: blur(var(--glass-blur));
-    }
-    .hdr .title {font-weight:700;font-size:1.05rem}
-    .hdr .sub {font-size:.78rem;color:var(--muted)}
-
-    /* Dashboard (initial) */
-    .dashboard {
-      margin-top:14px; display:grid; gap:12px;
-    }
-    .summaryRow {display:flex; gap:10px; align-items:center; justify-content:space-between}
-    .card-glass {
-      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.75));
-      border-radius: 12px; padding:12px; box-shadow: 0 10px 30px rgba(10,12,30,0.06);
-      border:1px solid rgba(0,0,0,0.04);
-    }
-    .statsGrid {display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
-    .stat {padding:14px; border-radius:10px; background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); text-align:left}
-    .stat h3{margin:0;font-size:1.05rem}
-    .enterBtn {
-      margin-top:8px; width:100%;
-      background: linear-gradient(90deg,var(--accent),var(--accent-2));
-      color:white; font-weight:700; border:none; padding:12px; border-radius:12px; box-shadow: 0 14px 40px rgba(107,92,255,0.18);
-    }
-
-    /* small tile for categories */
-    .catTile {display:flex;flex-direction:column; gap:6px; padding:12px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.92)); border:1px solid rgba(0,0,0,0.03)}
-    .catTitle{font-weight:700}
-    .catSub{font-size:.82rem;color:var(--muted)}
-
-    /* Flip clock */
-    .flipClock {display:flex; gap:8px; align-items:center; justify-content:center; margin-top:6px}
-    .flipSegment {background:#0b1220;color:white;padding:8px 10px;border-radius:10px;min-width:54px;text-align:center;box-shadow: 0 8px 20px rgba(2,6,23,0.45)}
-    .flipLabel{font-size:.65rem;color:rgba(255,255,255,0.7);margin-top:6px}
-
-    /* MAIN app view (list) */
-    .controls {display:flex; gap:8px; align-items:center; margin-top:12px}
-    .chip {padding:8px 12px; background:rgba(255,255,255,0.86); border-radius:999px; font-weight:600;border:1px solid rgba(0,0,0,0.04)}
-    .chip.active { box-shadow: 0 10px 28px rgba(0,0,0,0.06) }
-
-    /* timeline */
-    .timeline {margin-top:12px; padding:10px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85)); border:1px solid rgba(0,0,0,0.03)}
-    .timelineRow {display:flex; gap:8px; align-items:center}
-
-    .segment {flex:1; min-width:0; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.85rem}
-    .seg-on{ background: linear-gradient(180deg, rgba(92,154,255,0.12), rgba(218,236,255,0.06)); color:#054a7a }
-    .seg-almost{ background: linear-gradient(180deg, rgba(255,223,138,0.12), rgba(255,249,230,0.04)); color:#92611b }
-    .seg-late{ background: linear-gradient(180deg, rgba(255,164,164,0.12), rgba(255,242,242,0.04)); color:#9b1c1c }
-    .seg-complete{ background: linear-gradient(180deg, rgba(167,255,199,0.12), rgba(240,255,244,0.04)); color:#116530 }
-
-    .pin {position:absolute; width:12px; height:18px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; transform: translateX(-50%) translateY(-60%); box-shadow: 0 6px 18px rgba(10,12,20,0.12); border:2px solid rgba(255,255,255,0.9)}
-
-    /* task groups */
-    .groupCard {margin-top:12px; border-radius:12px; padding:10px; background:linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.9)); border:1px solid rgba(0,0,0,0.03)}
-    .groupHeader {display:flex; align-items:center; gap:10px; justify-content:space-between}
-    .groupTitle {font-weight:700}
-    .groupActions {display:flex; gap:8px; align-items:center}
-    .subList {margin-top:8px; display:flex; flex-direction:column; gap:8px}
-    .subTask {display:flex; gap:10px; align-items:flex-start; padding:10px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,1), rgba(250,250,255,0.95)); border:1px solid rgba(0,0,0,0.03)}
-    .subTask .title {font-weight:600}
-    .subTask .meta {font-size:.8rem; color:var(--muted)}
-
-    /* FAB */
-    .fab {position:fixed; right:18px; bottom:18px; z-index:1200; width:64px;height:64px;border-radius:18px; display:flex; align-items:center; justify-content:center; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; border:none; box-shadow:0 18px 50px rgba(107,92,255,0.18)}
-    .backBtn {background:transparent;border:none;font-weight:700;color:var(--muted)}
-
-    /* small screens */
-    @media (max-width:520px){
-      .statsGrid {grid-template-columns:1fr 1fr}
-      .flipSegment {min-width:44px;padding:6px 8px}
-      .fab {width:56px;height:56px}
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N&N Wedding - 1 มีนาคม 2568</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="container-app">
-    <!-- Header -->
-    <div class="hdr">
-      <div style="display:flex;gap:10px;align-items:center">
-        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#6b5cff"/><stop offset="1" stop-color="#5cc8ff"/></linearGradient></defs>
-          <rect x="0" y="0" width="42" height="42" rx="10" fill="url(#g)"></rect>
-          <path d="M12 20s-6-4.35-8.12-6.5C1.5 10.5 5 6 8.5 6 10.2 6 12 7.5 12 7.5S13.8 6 15.5 6C19 6 22.5 10.5 20.12 13.5 18 15.65 12 20 12 20z" fill="#fff" opacity="0.96"/>
-        </svg>
-      </div>
-      <div>
-        <div class="title">Wedding Checklist</div>
-        <div class="sub">สรุปและจัดการงานแต่งแบบทันสมัย</div>
-      </div>
-
-      <!-- Flip clock small on right -->
-      <div style="margin-left:auto;text-align:right">
-        <div id="flipPreview" style="display:flex;flex-direction:column;align-items:flex-end">
-          <div class="flipClock" id="flipClockPreview">
-            <div class="flipSegment" id="fpDays">--</div>
-            <div class="flipSegment" id="fpHours">--</div>
-            <div class="flipSegment" id="fpMins">--</div>
-            <div class="flipSegment" id="fpSecs">--</div>
-          </div>
-          <div class="flipLabel">Countdown</div>
+<body class="ios-theme">
+    <!-- Auth Modal -->
+    <div class="modal fade" id="authModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ios-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">ยืนยันตัวตน</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="auth-icon">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                    <h4>N&N Wedding</h4>
+                    <p class="text-muted">กรุณากรอกรหัสผ่านเพื่อดำเนินการ</p>
+                    <form id="authForm">
+                        <div class="mb-3">
+                            <input type="password" id="authPassword" class="form-control ios-input" placeholder="รหัสผ่าน" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 ios-btn">
+                            ยืนยัน
+                        </button>
+                    </form>
+                    <p class="small text-muted mt-3">รหัสผ่านคือวันสำคัญของเรา</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
-    <!-- DASHBOARD (initial loading/home) -->
-    <div id="dashboard" class="dashboard">
-      <div class="summaryRow">
-        <div class="card-glass" style="flex:1">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <div style="font-weight:700">ภาพรวมงาน</div>
-              <div style="font-size:.85rem;color:var(--muted)">สถานะปัจจุบันของงานทั้งหมด</div>
+    <!-- Main App -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="app-title">N&N Wedding</h1>
+                        <p class="app-subtitle">1 มีนาคม 2568</p>
+                    </div>
+                    <div class="col-auto">
+                        <div class="days-badge">
+                            <span id="daysCount">0</span>
+                            <small>วัน</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div style="text-align:right">
-              <div style="font-weight:800;font-size:1.05rem" id="sumTotal">0</div>
-              <div style="font-size:.78rem;color:var(--muted)">งานรวม</div>
-            </div>
-          </div>
+        </header>
 
-          <div style="margin-top:10px" class="statsGrid">
-            <div class="stat">
-              <h3 id="sumOn">0</h3>
-              <div class="tiny">On Time</div>
-            </div>
-            <div class="stat">
-              <h3 id="sumAlmost">0</h3>
-              <div class="tiny">Almost Due</div>
-            </div>
-            <div class="stat">
-              <h3 id="sumLate">0</h3>
-              <div class="tiny">Too Late</div>
-            </div>
-            <div class="stat">
-              <h3 id="sumDone">0</h3>
-              <div class="tiny">Completed</div>
-            </div>
-          </div>
+        <main class="app-main">
+            <!-- Progress Section -->
+            <section class="progress-section">
+                <div class="container-fluid">
+                    <div class="progress-card ios-card">
+                        <div class="progress-circle">
+                            <svg width="80" height="80" viewBox="0 0 80 80">
+                                <circle cx="40" cy="40" r="36" stroke="#e9ecef" stroke-width="8" fill="none"/>
+                                <circle cx="40" cy="40" r="36" stroke="#007AFF" stroke-width="8" fill="none" 
+                                        stroke-linecap="round" transform="rotate(-90 40 40)"
+                                        stroke-dasharray="226.194" stroke-dashoffset="226.194"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span id="progressPercent">0</span>%
+                            </div>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalTasks">0</div>
+                                <div class="stat-label">ทั้งหมด</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="completedTasks">0</div>
+                                <div class="stat-label">เสร็จแล้ว</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="remainingTasks">0</div>
+                                <div class="stat-label">เหลือ</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-          <button id="enterBtn" class="enterBtn">Enter App — ดูรายการ</button>
-        </div>
+            <!-- Quick Actions -->
+            <section class="actions-section">
+                <div class="container-fluid">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button class="action-btn ios-card" id="addTaskBtn">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>เพิ่มรายการ</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="action-btn ios-card" id="filterBtn">
+                                <i class="bi bi-funnel"></i>
+                                <span>ตัวกรอง</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-        <div style="width:220px">
-          <div class="catTile">
-            <div class="catTitle">Wedding Date</div>
-            <div class="catSub" id="dashWeddingDate">—</div>
-            <div style="margin-top:8px; display:flex; gap:8px;">
-              <input id="dashboardDate" type="date" style="flex:1; padding:8px; border-radius:8px; border:1px solid rgba(0,0,0,0.06)"/>
-            </div>
-            <div style="margin-top:8px">
-              <button id="enterBtn2" class="enterBtn" style="padding:8px 10px">Enter</button>
-            </div>
-          </div>
-        </div>
-      </div>
+            <!-- Add Task Form -->
+            <section class="add-form-section" id="addFormSection" style="display: none;">
+                <div class="container-fluid">
+                    <div class="ios-card">
+                        <div class="card-header">
+                            <h5>เพิ่มรายการใหม่</h5>
+                            <button type="button" id="closeAddForm">&times;</button>
+                        </div>
+                        <form id="taskForm">
+                            <div class="form-group">
+                                <input type="text" id="taskName" class="ios-input" placeholder="ชื่อรายการ" required>
+                            </div>
+                            <div class="form-group">
+                                <select id="taskCategory" class="ios-select" required>
+                                    <option value="">เลือกช่วงเวลา</option>
+                                    <option value="6">6 เดือนก่อนงาน</option>
+                                    <option value="3">3 เดือนก่อนงาน</option>
+                                    <option value="1">1 เดือนก่อนงาน</option>
+                                    <option value="0.25">1 สัปดาห์ก่อนงาน</option>
+                                    <option value="0">วันงาน</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <textarea id="taskDescription" class="ios-textarea" placeholder="รายละเอียดเพิ่มเติม" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 ios-btn">
+                                <i class="bi bi-check-lg me-2"></i>บันทึกรายการ
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
-        <div class="card-glass catTile">
-          <div class="catTitle">หมวด: สถานที่</div>
-          <div class="catSub">จอง สถานที่ → มัดจำ → ยืนยันวันที่</div>
-        </div>
-        <div class="card-glass catTile">
-          <div class="catTitle">หมวด: อาหารและเครื่องดื่ม</div>
-          <div class="catSub">ติดต่อร้าน → ทดสอบอาหาร → ยืนยันเมนู</div>
-        </div>
+            <!-- Status Legend -->
+            <section class="legend-section">
+                <div class="container-fluid">
+                    <div class="ios-card">
+                        <div class="status-legend">
+                            <div class="status-item">
+                                <div class="status-dot ontime"></div>
+                                <span>ตามเวลา</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-dot almost"></div>
+                                <span>ใกล้ถึงกำหนด</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-dot late"></div>
+                                <span>เลยกำหนด</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-        <div class="card-glass catTile">
-          <div class="catTitle">หมวด: ถ่ายภาพ</div>
-          <div class="catSub">เลือกแพ็กเกจ → นัดวันถ่าย → Confirm</div>
-        </div>
-        <div class="card-glass catTile">
-          <div class="catTitle">หมวด: การต้อนรับ</div>
-          <div class="catSub">ทีมต้อนรับ → สคริปต์ → แผนผังที่นั่ง</div>
-        </div>
-      </div>
+            <!-- Tasks List -->
+            <section class="tasks-section">
+                <div class="container-fluid">
+                    <div id="tasksContainer">
+                        <!-- Tasks will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- MAIN APP (hidden initially) -->
-    <div id="mainApp" style="display:none">
-      <div class="controls">
-        <button class="chip" id="backToDash"><span class="backBtn">← กลับ</span></button>
-        <div class="chip" id="filterAll">All</div>
-        <div class="chip" id="filterOn">On Time</div>
-        <div class="chip" id="filterAlmost">Almost</div>
-        <div class="chip" id="filterLate">Too Late</div>
-        <div class="chip" id="filterDone">Completed</div>
-        <div style="margin-left:auto; display:flex; gap:8px">
-          <button class="chip" id="loadSample">Sample</button>
-          <button class="chip" id="clearAll">Clear</button>
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1">
+        <div class="modal-dialog modal-bottom">
+            <div class="modal-content ios-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">ตัวกรอง</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="filter-option">
+                        <input type="radio" name="filter" id="filterAll" checked>
+                        <label for="filterAll">ทั้งหมด</label>
+                    </div>
+                    <div class="filter-option">
+                        <input type="radio" name="filter" id="filterPending">
+                        <label for="filterPending">ที่ต้องทำ</label>
+                    </div>
+                    <div class="filter-option">
+                        <input type="radio" name="filter" id="filterCompleted">
+                        <label for="filterCompleted">เสร็จแล้ว</label>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <div class="timeline" id="timeline">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
-          <div style="font-weight:700">Timeline</div>
-          <div class="tiny" id="timelineSubtitle">6m → Day</div>
-        </div>
-        <div class="timelineRow" id="timelineRow"></div>
-      </div>
-
-      <div id="groupsContainer">
-        <!-- Groups inserted here -->
-      </div>
     </div>
 
-  </div>
-
-  <!-- Floating Add Button -->
-  <button class="fab" id="fab" aria-label="Add">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-  </button>
-
-  <!-- Modal Add/Edit Subtask -->
-  <div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <form class="modal-content" id="taskForm">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Add Task</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" id="taskId">
-          <div class="mb-2">
-            <label class="form-label small">หมวด (Category)</label>
-            <select id="taskCategory" class="form-select">
-              <!-- options inserted dynamically -->
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">ชื่องาน</label>
-            <input id="taskTitle" class="form-control" required/>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">วันที่ควรทำเสร็จ</label>
-            <input id="taskDue" type="date" class="form-control" required/>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">รายละเอียด</label>
-            <textarea id="taskDesc" class="form-control" rows="3"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">สถานะเริ่มต้น</label>
-            <select id="taskStatus" class="form-select">
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn" id="saveTaskBtn" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    /****************************************************
-     * Wedding Checklist Manager — Single file
-     * - Dashboard (loading) -> Enter App -> Detailed List
-     * - Group-level subtasks with "Mark group complete"
-     * - Filter chips that change theme color
-     * - Flip-style countdown
-     * - localStorage persistence
-     ****************************************************/
-
-    /* ---------- Storage keys ---------- */
-    const KEY_TASKS = 'wcm_v2_tasks';
-    const KEY_WEDDING = 'wcm_v2_wedding';
-
-    /* ---------- Initial categories & sample detailed subtasks ---------- */
-    const DEFAULT_WED = (()=>{ const d=new Date(); d.setMonth(d.getMonth()+6); return d.toISOString().slice(0,10); })();
-
-    // categories each has id, title
-    const DEFAULT_CATEGORIES = [
-      {id:'cat_venue', title:'สถานที่'},
-      {id:'cat_food', title:'อาหารและเครื่องดื่ม'},
-      {id:'cat_photo', title:'ถ่ายภาพ'},
-      {id:'cat_host', title:'การต้อนรับ'},
-      {id:'cat_misc', title:'อื่นๆ'}
-    ];
-
-    // detailed sample subtasks grouped by category (due offsets relative to wedding)
-    const SAMPLE_GROUPS = {
-      'cat_venue': [
-        {title:'ค้นหาสถานที่ที่เข้ากับธีม', offset:-170},
-        {title:'ติดต่อและขอราคา', offset:-168},
-        {title:'เซ็นสัญญา/วางมัดจำ', offset:-160}
-      ],
-      'cat_food': [
-        {title:'ค้นหาร้านอาหาร/แคเทอริ่ง', offset:-100},
-        {title:'นัดชิมเมนู (food tasting)', offset:-95},
-        {title:'ยืนยันจำนวนแขก & เมนู', offset:-60},
-        {title:'สรุปใบเสนอราคาและเซ็นสัญญา', offset:-55}
-      ],
-      'cat_photo': [
-        {title:'ค้นหาช่างภาพ', offset:-120},
-        {title:'นัดถ่ายพรีเวดดิ้ง', offset:-90},
-        {title:'ยืนยันแพ็กเกจ & วันถ่าย', offset:-30}
-      ],
-      'cat_host': [
-        {title:'เตรียมทีมต้อนรับ', offset:-20},
-        {title:'ซักซ้อมบทต้อนรับ', offset:-7},
-        {title:'แจกบทบาทและหน้าที่', offset:-3}
-      ],
-      'cat_misc': [
-        {title:'จัดเตรียมของใช้ฉุกเฉิน', offset:-10},
-        {title:'เตรียมสคริปต์พิธี', offset:-15}
-      ]
-    };
-
-    /* ---------- App state ---------- */
-    let weddingDate = localStorage.getItem(KEY_WEDDING) || DEFAULT_WED;
-    let tasks = []; // array of {id, catId, title, desc, due (yyyy-mm-dd), status}
-    let categories = DEFAULT_CATEGORIES.map(c=>({...c}));
-
-    /* ---------- DOM refs ---------- */
-    const dashboard = document.getElementById('dashboard');
-    const mainApp = document.getElementById('mainApp');
-    const enterBtn = document.getElementById('enterBtn');
-    const enterBtn2 = document.getElementById('enterBtn2');
-    const dashboardDate = document.getElementById('dashboardDate');
-    const dashWeddingDate = document.getElementById('dashWeddingDate');
-    const sumTotal = document.getElementById('sumTotal');
-    const sumOn = document.getElementById('sumOn');
-    const sumAlmost = document.getElementById('sumAlmost');
-    const sumLate = document.getElementById('sumLate');
-    const sumDone = document.getElementById('sumDone');
-
-    const timelineRow = document.getElementById('timelineRow');
-    const groupsContainer = document.getElementById('groupsContainer');
-    const fab = document.getElementById('fab');
-
-    const filterChips = {
-      all: document.getElementById('filterAll'),
-      on: document.getElementById('filterOn'),
-      almost: document.getElementById('filterAlmost'),
-      late: document.getElementById('filterLate'),
-      done: document.getElementById('filterDone')
-    };
-
-    const loadSampleBtn = document.getElementById('loadSample');
-    const clearAllBtn = document.getElementById('clearAll');
-    const backToDashBtn = document.getElementById('backToDash');
-
-    /* modal */
-    const taskModalEl = document.getElementById('taskModal');
-    const taskModal = new bootstrap.Modal(taskModalEl);
-    const taskForm = document.getElementById('taskForm');
-    const modalTitle = document.getElementById('modalTitle');
-    const taskIdField = document.getElementById('taskId');
-    const taskCategory = document.getElementById('taskCategory');
-    const taskTitle = document.getElementById('taskTitle');
-    const taskDue = document.getElementById('taskDue');
-    const taskDesc = document.getElementById('taskDesc');
-    const taskStatus = document.getElementById('taskStatus');
-
-    /* flip clock fields */
-    const fpDays = document.getElementById('fpDays');
-    const fpHours = document.getElementById('fpHours');
-    const fpMins = document.getElementById('fpMins');
-    const fpSecs = document.getElementById('fpSecs');
-    const fp_preview_days = document.getElementById('fpDays'); // same
-
-    /* ---------- Helpers ---------- */
-    const $id = (s)=>document.getElementById(s);
-    const uid = ()=> 't_'+Math.random().toString(36).slice(2,9);
-    const iso = d => (new Date(d)).toISOString().slice(0,10);
-    function daysBetween(a,b){ const MS=1000*60*60*24; return Math.floor((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/MS); }
-    function clamp(n, a,b){ return Math.max(a, Math.min(b, n)); }
-
-    /* ---------- Storage ---------- */
-    function load(){
-      const raw = localStorage.getItem(KEY_TASKS);
-      if(raw){ try{ tasks = JSON.parse(raw) } catch(e){ tasks=[] } }
-      else { seedSample(); save(); }
-      weddingDate = localStorage.getItem(KEY_WEDDING) || weddingDate;
-    }
-    function save(){ localStorage.setItem(KEY_TASKS, JSON.stringify(tasks)); localStorage.setItem(KEY_WEDDING, weddingDate); }
-
-    /* ---------- Seed sample from SAMPLE_GROUPS ---------- */
-    function seedSample(){
-      tasks = [];
-      const w = new Date(weddingDate + 'T00:00:00');
-      for(const cat of categories){
-        const arr = SAMPLE_GROUPS[cat.id] || [];
-        for(const s of arr){
-          const due = new Date(w.getFullYear(), w.getMonth(), w.getDate());
-          due.setDate(due.getDate() + s.offset);
-          tasks.push({ id: uid(), catId: cat.id, title: s.title, desc:'', due: iso(due), status:'pending' });
-        }
-      }
-      // add some global items
-      tasks.push({id: uid(), catId: 'cat_misc', title:'เตรียมของใช้ฉุกเฉิน', desc:'ยา ชุดสำรอง', due: iso(new Date(new Date(w).setDate(new Date(w).getDate()-10))), status:'pending'});
-    }
-
-    /* ---------- Status calculation ---------- */
-    function calcStatus(t){
-      if(!t) return 'on';
-      if(t.status === 'completed') return 'completed';
-      const today = new Date();
-      const due = new Date((t.due||'')+'T00:00:00');
-      const daysLeft = daysBetween(today, due);
-      if(daysLeft < 0) return 'late';
-      if(daysLeft <= 3) return 'almost';
-      return 'on';
-    }
-
-    /* ---------- Summary for Dashboard ---------- */
-    function updateDashboardSummaries(){
-      const totals = {on:0, almost:0, late:0, completed:0};
-      tasks.forEach(t => {
-        const s = calcStatus(t);
-        if(s === 'completed') totals.completed++;
-        else if(s === 'late') totals.late++;
-        else if(s === 'almost') totals.almost++;
-        else totals.on++;
-      });
-      sumTotal.textContent = tasks.length;
-      sumOn.textContent = totals.on;
-      sumAlmost.textContent = totals.almost;
-      sumLate.textContent = totals.late;
-      sumDone.textContent = totals.completed;
-
-      dashWeddingDate.textContent = weddingDate;
-      dashboardDate.value = weddingDate;
-    }
-
-    /* ---------- Render timeline ---------- */
-    function renderTimeline(){
-      timelineRow.innerHTML = '';
-      const segs = [
-        {k:'6 months', w:180, cls:'seg-on'},
-        {k:'3 months', w:90, cls:'seg-on'},
-        {k:'1 month', w:30, cls:'seg-almost'},
-        {k:'1 week', w:7, cls:'seg-late'},
-        {k:'day', w:1, cls:'seg-complete'}
-      ];
-      for(const s of segs){
-        const el = document.createElement('div');
-        el.className = 'segment '+s.cls;
-        el.style.flex = s.w;
-        el.textContent = s.k;
-        el.style.position='relative';
-        timelineRow.appendChild(el);
-      }
-      // pins
-      // compute pos within total 180-day span
-      const total = 180;
-      tasks.forEach(t=>{
-        if(!t.due) return;
-        const due = new Date(t.due+'T00:00:00');
-        const w = new Date(weddingDate+'T00:00:00');
-        let daysBefore = daysBetween(due, w);
-        daysBefore = clamp(daysBefore, 0, total);
-        const pos = (total - daysBefore) / total; // 0..1
-        const pin = document.createElement('div');
-        pin.className = 'pin';
-        const s = calcStatus(t);
-        if(s==='on') pin.style.background = 'linear-gradient(180deg,#5cc8ff,#6b5cff)';
-        if(s==='almost') pin.style.background = 'linear-gradient(180deg,#ffd57a,#ffb06b)';
-        if(s==='late') pin.style.background = 'linear-gradient(180deg,#ff8a8a,#ff4d4d)';
-        if(s==='completed') pin.style.background = 'linear-gradient(180deg,#7ef0b2,#3bd07a)';
-        pin.style.left = (pos*100) + '%';
-        pin.style.top = '8px';
-        pin.title = t.title + ' — ' + t.due;
-        pin.dataset.id = t.id;
-        timelineRow.appendChild(pin);
-      });
-    }
-
-    /* ---------- Render Groups & Subtasks ---------- */
-    let currentFilter = 'all'; // all/on/almost/late/completed
-    function renderGroups(){
-      groupsContainer.innerHTML = '';
-      for(const cat of categories){
-        const groupCard = document.createElement('div');
-        groupCard.className = 'groupCard';
-        const groupHeader = document.createElement('div');
-        groupHeader.className = 'groupHeader';
-        const catTitle = document.createElement('div');
-        catTitle.innerHTML = `<div class="groupTitle">${cat.title}</div><div class="tiny" style="color:var(--muted)">${countTasksInCat(cat.id)} งาน</div>`;
-        const groupActions = document.createElement('div');
-        groupActions.className = 'groupActions';
-        const markAllBtn = document.createElement('button');
-        markAllBtn.className = 'chip';
-        markAllBtn.textContent = 'Mark group complete';
-        markAllBtn.addEventListener('click', ()=> toggleGroupComplete(cat.id, markAllBtn));
-        const expandBtn = document.createElement('button');
-        expandBtn.className = 'chip';
-        expandBtn.textContent = 'Expand';
-        groupActions.appendChild(markAllBtn);
-        groupActions.appendChild(expandBtn);
-
-        groupHeader.appendChild(catTitle);
-        groupHeader.appendChild(groupActions);
-
-        groupCard.appendChild(groupHeader);
-
-        const subList = document.createElement('div');
-        subList.className = 'subList';
-        // fill subtasks for this category
-        const subs = tasks.filter(t => t.catId === cat.id);
-        if(subs.length === 0){
-          const em = document.createElement('div'); em.className='tiny'; em.textContent = 'ไม่มีรายการในหมวดนี้';
-          subList.appendChild(em);
-        } else {
-          subs.sort((a,b)=> new Date(a.due) - new Date(b.due));
-          for(const t of subs){
-            const st = calcStatus(t);
-            if(currentFilter !== 'all' && st !== currentFilter) continue;
-            const sub = document.createElement('div'); sub.className='subTask';
-            const left = document.createElement('div'); left.style.flex='1';
-            left.innerHTML = `<div class="title ${t.status==='completed'?'text-decoration-line-through text-muted':''}">${escapeHtml(t.title)}</div>
-                              <div class="meta">${escapeHtml(t.desc||'')} <span style="margin-left:8px" class="tiny" >Due: ${t.due}</span></div>
-                              <div style="margin-top:6px" class="tiny" >Status: <strong>${st}</strong></div>`;
-            const actions = document.createElement('div'); actions.style.display='flex'; actions.style.flexDirection='column'; actions.style.gap='6px';
-            const doneBtn = document.createElement('button'); doneBtn.className='chip'; doneBtn.textContent = t.status==='completed' ? 'Unmark' : 'Done';
-            doneBtn.addEventListener('click', ()=> { t.status = t.status==='completed' ? 'pending':'completed'; save(); renderAllViews(); });
-            const editBtn = document.createElement('button'); editBtn.className='chip'; editBtn.textContent='Edit';
-            editBtn.addEventListener('click', ()=> openEdit(t.id));
-            const delBtn = document.createElement('button'); delBtn.className='chip'; delBtn.textContent='Delete';
-            delBtn.addEventListener('click', ()=> { if(confirm('ลบรายการนี้?')){ tasks = tasks.filter(x=>x.id!==t.id); save(); renderAllViews(); }});
-            actions.appendChild(doneBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
-            sub.appendChild(left); sub.appendChild(actions);
-            subList.appendChild(sub);
-          }
-        }
-
-        groupCard.appendChild(subList);
-        // expand/collapse behavior
-        expandBtn.addEventListener('click', ()=>{
-          if(subList.style.display === 'none' || subList.style.display===''){
-            subList.style.display = 'flex'; expandBtn.textContent='Collapse';
-          } else { subList.style.display = 'none'; expandBtn.textContent='Expand'; }
-        });
-
-        groupsContainer.appendChild(groupCard);
-      }
-    }
-
-    function countTasksInCat(catId){
-      return tasks.filter(t=>t.catId===catId).length;
-    }
-
-    /* ---------- group complete toggle ---------- */
-    function toggleGroupComplete(catId, btnEl){
-      // if all completed -> unmark all; else mark all
-      const subs = tasks.filter(t=>t.catId===catId);
-      const allDone = subs.every(s => s.status === 'completed');
-      subs.forEach(s => s.status = allDone ? 'pending' : 'completed');
-      save(); renderAllViews();
-      btnEl.textContent = allDone ? 'Mark group complete' : 'Unmark group';
-    }
-
-    /* ---------- Add / Edit Task ---------- */
-    function openAdd(){
-      taskIdField.value = '';
-      taskCategory.innerHTML = '';
-      categories.forEach(c=> {
-        const opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.title; taskCategory.appendChild(opt);
-      });
-      // default select first
-      taskCategory.value = categories[0].id;
-      taskTitle.value = ''; taskDesc.value = ''; taskDue.value = weddingDate; taskStatus.value = 'pending';
-      modalTitle.textContent = 'Add task';
-      taskModal.show();
-    }
-    function openEdit(id){
-      const t = tasks.find(x=>x.id===id); if(!t) return;
-      taskIdField.value = t.id;
-      taskCategory.innerHTML=''; categories.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.id; opt.textContent=c.title; taskCategory.appendChild(opt) });
-      taskCategory.value = t.catId;
-      taskTitle.value = t.title; taskDesc.value = t.desc; taskDue.value = t.due; taskStatus.value = t.status||'pending';
-      modalTitle.textContent = 'Edit task';
-      taskModal.show();
-    }
-    taskForm.addEventListener('submit', (ev)=>{
-      ev.preventDefault();
-      const id = taskIdField.value;
-      const catId = taskCategory.value;
-      const title = taskTitle.value.trim();
-      const due = taskDue.value;
-      const desc = taskDesc.value.trim();
-      const status = taskStatus.value;
-      if(!title || !due) { alert('กรุณากรอกชื่อและวันที่'); return; }
-      if(id){
-        const t = tasks.find(x=>x.id===id);
-        if(t){ t.catId = catId; t.title = title; t.due = due; t.desc = desc; t.status = status; }
-      } else {
-        tasks.push({ id: uid(), catId, title, desc, due, status });
-      }
-      save(); taskModal.hide(); renderAllViews();
-    });
-
-    /* ---------- Filter chips (also change theme) ---------- */
-    let theme = 'default';
-    function setFilter(mode, el){
-      currentFilter = mode;
-      // highlight chip
-      Object.values(filterChips).forEach(c=> c.classList.remove('active'));
-      if(el) el.classList.add('active');
-      // set theme and change accent
-      switch(mode){
-        case 'on': document.documentElement.style.setProperty('--accent','#5cc8ff'); document.documentElement.style.setProperty('--accent-2','#6b5cff'); break;
-        case 'almost': document.documentElement.style.setProperty('--accent','#ffd57a'); document.documentElement.style.setProperty('--accent-2','#ffb06b'); break;
-        case 'late': document.documentElement.style.setProperty('--accent','#ff8a8a'); document.documentElement.style.setProperty('--accent-2','#ff4d4d'); break;
-        case 'done': document.documentElement.style.setProperty('--accent','#7ef0b2'); document.documentElement.style.setProperty('--accent-2','#3bd07a'); break;
-        default: document.documentElement.style.setProperty('--accent','#6b5cff'); document.documentElement.style.setProperty('--accent-2','#5cc8ff');
-      }
-      renderAllViews();
-    }
-
-    /* ---------- Flip clock (countdown) ---------- */
-    function updateFlipClock(){
-      if(!weddingDate){ fpDays.textContent='--'; fpHours.textContent='--'; fpMins.textContent='--'; fpSecs.textContent='--'; return; }
-      const now = new Date();
-      const wed = new Date(weddingDate+'T00:00:00');
-      let diff = wed - now;
-      if(diff <= 0){
-        fpDays.textContent = '0d'; fpHours.textContent='00h'; fpMins.textContent='00m'; fpSecs.textContent='00s';
-        return;
-      }
-      const d = Math.floor(diff / (1000*60*60*24));
-      diff -= d*24*60*60*1000;
-      const h = Math.floor(diff / (1000*60*60));
-      diff -= h*60*60*1000;
-      const m = Math.floor(diff / (1000*60));
-      diff -= m*60*1000;
-      const s = Math.floor(diff / 1000);
-      fpDays.textContent = d + 'd';
-      fpHours.textContent = String(h).padStart(2,'0') + 'h';
-      fpMins.textContent = String(m).padStart(2,'0') + 'm';
-      fpSecs.textContent = String(s).padStart(2,'0') + 's';
-    }
-    setInterval(updateFlipClock, 1000);
-
-    /* ---------- UI & Events ---------- */
-    function renderAllViews(){
-      updateDashboardSummaries();
-      renderTimeline();
-      renderGroups();
-      updateFlipClock();
-    }
-
-    // Entry into app
-    enterBtn.addEventListener('click', ()=> { dashboard.style.display='none'; mainApp.style.display='block'; });
-    enterBtn2.addEventListener('click', ()=> { dashboard.style.display='none'; mainApp.style.display='block'; });
-
-    // back to dashboard
-    backToDashBtn.addEventListener('click', ()=> { mainApp.style.display='none'; dashboard.style.display='block'; });
-
-    // fab -> add
-    fab.addEventListener('click', ()=> openAdd());
-
-    // load sample: rebuild sample (ask)
-    loadSampleBtn.addEventListener('click', ()=> {
-      if(!confirm('โหลดตัวอย่างจะเขียนทับข้อมูลปัจจุบัน ใช่หรือไม่?')) return;
-      seedSample(); save(); renderAllViews();
-    });
-    clearAllBtn.addEventListener('click', ()=> {
-      if(!confirm('ล้างข้อมูลทั้งหมด ใช่หรือไม่?')) return;
-      tasks=[]; save(); renderAllViews();
-    });
-
-    // filter chips
-    filterChips.all.addEventListener('click', ()=> setFilter('all', filterChips.all));
-    filterChips.on.addEventListener('click', ()=> setFilter('on', filterChips.on));
-    filterChips.almost.addEventListener('click', ()=> setFilter('almost', filterChips.almost));
-    filterChips.late.addEventListener('click', ()=> setFilter('late', filterChips.late));
-    filterChips.done.addEventListener('click', ()=> setFilter('done', filterChips.done));
-
-    // dashboard wedding date change
-    dashboardDate.addEventListener('change', ()=> {
-      weddingDate = dashboardDate.value || DEFAULT_WED; save(); renderAllViews();
-    });
-
-    // timeline pin click -> edit
-    document.getElementById('timelineRow').addEventListener('click', (ev)=>{
-      const p = ev.target.closest('.pin');
-      if(p && p.dataset.id){ openEdit(p.dataset.id); }
-    });
-
-    /* ---------- utility ---------- */
-    function escapeHtml(s){ if(!s) return ''; return (''+s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-
-    /* ---------- Init load ---------- */
-    function init(){
-      // load categories into modal select
-      taskCategory.innerHTML='';
-      categories.forEach(c=> { const opt=document.createElement('option'); opt.value=c.id; opt.textContent=c.title; taskCategory.appendChild(opt); });
-
-      load();
-      renderAllViews();
-      // default filter highlight
-      setFilter('all', filterChips.all);
-    }
-    init();
-
-    /* ---------- Save wedding date on unload (if changed on dashboard) ---------- */
-    window.addEventListener('beforeunload', ()=> { save(); });
-
-  </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
