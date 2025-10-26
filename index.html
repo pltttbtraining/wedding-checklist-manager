@@ -1,677 +1,750 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wedding Checklist Manager</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Wedding Checklist — Mobile</title>
 
-  <!-- Bootstrap 5 CDN -->
+  <!-- Use system font for iPhone-like feel -->
+  <meta name="color-scheme" content="light dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Minimal Bootstrap for modal & basic utilities -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
+    /* ---------- Base (mobile-first) ---------- */
     :root{
-      --accent: #6c5ce7;
-      --muted: #f7f6ff;
-      --card-bg: #ffffff;
-      --timeline-height: 72px;
+      --bg: #fbf9ff;
+      --glass: rgba(255,255,255,0.6);
+      --accent: #6b5cff;       /* soft purple */
+      --accent-2: #5cc8ff;     /* soft cyan */
+      --muted: #8b8b9a;
+      --card-radius: 16px;
+      --glass-blur: 12px;
+      --shadow-1: 0 6px 20px rgba(34,34,60,0.10);
+      --glass-border: rgba(255,255,255,0.35);
+      --glass-ghost: rgba(255,255,255,0.08);
+      --success: #16a34a;
     }
-    body{
-      background: linear-gradient(180deg, #fffefe 0%, #fff6f8 100%);
-      min-height:100vh;
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      background: linear-gradient(180deg, #fffefe 0%, #fff7fb 100%);
+      color: #111827;
+      -webkit-tap-highlight-color: transparent;
     }
-    .app-header{
-      padding: 1.25rem;
-      border-radius: .75rem;
-      background: linear-gradient(90deg, rgba(108,92,231,0.08), rgba(252, 244, 255, 0.6));
-      box-shadow: 0 4px 12px rgba(16,24,40,0.06);
+
+    /* Container */
+    .app {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    /* Header card (glass) */
+    .hdr {
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(250,248,255,0.6));
+      border-radius: var(--card-radius);
+      padding: 14px;
+      box-shadow: var(--shadow-1);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(var(--glass-blur));
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .hdr .title {
+      font-weight:700;
+      font-size:1.05rem;
+      letter-spacing: -0.2px;
+    }
+    .hdr .sub {
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    /* wedding date + countdown compact */
+    .countdownWrap {
+      margin-left:auto;
+      text-align:right;
+      min-width: 120px;
     }
     .countdown {
-      font-weight: 600;
-      font-size: 1.05rem;
+      font-weight:700;
+      font-size: .95rem;
+      color: #0f172a;
     }
-    .timeline {
-      height: var(--timeline-height);
-      border-radius: .6rem;
-      background: linear-gradient(90deg, #ffffff 0%, #fbfbff 100%);
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.03);
-      padding: 12px;
-      position: relative;
+    .wdate {
+      font-size:.78rem;
+      color: var(--muted);
+      margin-top:2px;
     }
-    .timeline-segment {
-      height: 100%;
-      display: inline-block;
-      vertical-align: top;
-      border-right: 1px dashed rgba(0,0,0,0.03);
-      padding: 6px;
-      box-sizing: border-box;
-      position: relative;
+
+    /* Timeline (glass stripe) */
+    .timelineWrap {
+      margin-top:14px;
+      border-radius: 12px;
+      padding: 10px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+      border: 1px solid rgba(0,0,0,0.04);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(12,12,30,0.06);
     }
-    .segment-label{
-      font-size: .85rem;
-      font-weight: 600;
-      color: #1f2937;
+    .timelineRow {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      overflow:hidden;
+      padding:8px 6px;
     }
-    .task-pin{
-      position: absolute;
-      top: 40%;
-      transform: translateY(-50%);
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.9);
-      box-shadow: 0 2px 6px rgba(16,24,40,0.12);
-    }
-    .task-card .completed {
-      text-decoration: line-through;
-      opacity: 0.6;
-    }
-    .badge-status {
+    .segment {
+      flex:1;
+      min-width: 0;
+      height:46px;
+      border-radius: 10px;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:.78rem;
       font-weight:600;
-      padding: .45em .6em;
-      font-size: .78rem;
-      border-radius: .55rem;
+      color: #0f172a;
+      box-shadow: inset 0 -4px 14px rgba(0,0,0,0.03);
     }
-    /* Status color mapping (soft tones) */
-    .status-on {
-      background: rgba(59,130,246,0.12);
-      color: #0369a1;
-      border: 1px solid rgba(59,130,246,0.12);
+    /* Soft tonal colors: on=blue, almost=yellow, late=red, complete=green */
+    .seg-blue{ background: linear-gradient(180deg, rgba(92,154,255,0.12), rgba(218,236,255,0.06)); border:1px solid rgba(92,154,255,0.06); }
+    .seg-yellow{ background: linear-gradient(180deg, rgba(255,223,138,0.12), rgba(255,249,230,0.04)); border:1px solid rgba(255,223,138,0.06); }
+    .seg-red{ background: linear-gradient(180deg, rgba(255,164,164,0.12), rgba(255,242,242,0.04)); border:1px solid rgba(255,164,164,0.06); }
+    .seg-green{ background: linear-gradient(180deg, rgba(167,255,199,0.12), rgba(240,255,244,0.04)); border:1px solid rgba(167,255,199,0.06); }
+
+    /* task pin (floating droplet) */
+    .pin {
+      position:absolute;
+      width:12px; height:18px;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      transform: translateX(-50%) translateY(-60%);
+      box-shadow: 0 6px 18px rgba(10,12,20,0.12);
+      border:2px solid rgba(255,255,255,0.9);
+      transition: transform .18s ease, opacity .18s ease;
     }
-    .status-almost {
-      background: rgba(234,179,8,0.12);
-      color: #92400e;
-      border: 1px solid rgba(234,179,8,0.12);
+    .pin:hover { transform: translateX(-50%) translateY(-75%) scale(1.08); }
+
+    /* Controls row */
+    .controls {
+      margin-top:12px;
+      display:flex; gap:8px; align-items:center;
     }
-    .status-late {
-      background: rgba(239,68,68,0.12);
-      color: #9b1c1c;
-      border: 1px solid rgba(239,68,68,0.12);
+    .control-chip {
+      background: rgba(255,255,255,0.7);
+      padding:6px 10px;
+      border-radius: 999px;
+      font-weight:600;
+      font-size:.85rem;
+      border:1px solid rgba(0,0,0,0.03);
+      box-shadow: 0 6px 18px rgba(12,12,30,0.04);
     }
-    .status-complete {
-      background: rgba(34,197,94,0.12);
-      color: #166534;
-      border: 1px solid rgba(34,197,94,0.12);
+
+    /* Task list: cards with glass and drop button */
+    .taskList {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:14px;
     }
-    /* small screens timeline vertical stacking */
-    @media (max-width: 768px) {
-      .timeline {
-        height: auto;
-        padding: 8px;
-      }
-      .timeline-segment {
-        display: block;
-        border-right: none;
-        border-bottom: 1px dashed rgba(0,0,0,0.03);
-        margin-bottom: 6px;
-      }
-      .task-pin{ top: auto; right: 12px; transform:none; }
+    .taskCard {
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7));
+      border-radius: 14px;
+      padding:12px;
+      box-shadow: 0 10px 30px rgba(9,10,25,0.06);
+      border:1px solid rgba(0,0,0,0.04);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
     }
+    .taskIcon {
+      width:44px; height:44px;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,255,0.75));
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 6px 18px rgba(12,12,30,0.06);
+      flex-shrink:0;
+    }
+    .taskBody { flex:1; min-width:0; }
+    .taskTitle { font-weight:700; font-size: .98rem; margin-bottom:4px; }
+    .taskMeta { font-size:.78rem; color:var(--muted); }
+
+    .taskActions { display:flex; gap:8px; margin-left:8px; align-items:center; }
+
+    /* Buttons style (glass droplet) */
+    .btn-glass {
+      border-radius: 999px;
+      padding:8px 12px;
+      font-weight:600;
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: 0 10px 24px rgba(12,12,30,0.06);
+      color: #111827;
+      transition: transform .14s linear, box-shadow .14s linear;
+    }
+    .btn-glass:active { transform: translateY(1px) scale(.997); }
+    .btn-accent {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      border: none;
+      box-shadow: 0 10px 30px rgba(107,92,255,0.18);
+    }
+
+    /* Completed look */
+    .completedTitle { text-decoration: line-through; color: rgba(8,8,8,0.4); }
+
+    /* Floating action button (FAB) */
+    .fab {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1200;
+      width:64px;height:64px;border-radius:24px;
+      display:flex;align-items:center;justify-content:center;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color:#fff;box-shadow: 0 20px 50px rgba(107,92,255,0.22);
+      border:none;
+      transition: transform .12s ease;
+      backdrop-filter: blur(6px);
+    }
+    .fab:active { transform: scale(.98); }
+
+    /* small screens adjustments */
+    @media (max-width:480px){
+      .hdr { padding:12px; gap:10px; border-radius:14px; }
+      .taskCard { padding:10px; border-radius:12px; }
+      .pin { width:10px;height:15px; }
+      .fab { width:56px;height:56px; border-radius:18px; }
+    }
+
+    /* utilities */
+    .muted { color:var(--muted); font-size:.82rem; }
+    .tiny { font-size:.72rem; color:var(--muted); }
+    .label-pill { font-size:.76rem; padding:6px 8px; border-radius:999px; background: rgba(0,0,0,0.03); }
   </style>
 </head>
 <body>
-  <div class="container py-4">
+  <div class="app">
     <!-- Header -->
-    <div class="app-header mb-4">
-      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-        <div>
-          <h2 class="mb-0">Wedding Checklist Manager</h2>
-          <small class="text-muted">จัดการรายการเตรียมงานแต่งงาน — มี timeline, filter, sort และ countdown</small>
-        </div>
+    <div class="hdr">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <!-- small heart logo -->
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1">
+              <stop offset="0" stop-color="#6b5cff"/>
+              <stop offset="1" stop-color="#5cc8ff"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="42" height="42" rx="10" fill="url(#g1)"></rect>
+          <path d="M12 20s-6-4.35-8.12-6.5C1.5 10.5 5 6 8.5 6 10.2 6 12 7.5 12 7.5S13.8 6 15.5 6C19 6 22.5 10.5 20.12 13.5 18 15.65 12 20 12 20z" fill="#fff" opacity="0.96"/>
+        </svg>
+      </div>
 
-        <div class="d-flex gap-3 align-items-center">
-          <div class="text-end">
-            <div class="small text-muted">Wedding Date</div>
-            <input id="weddingDateInput" type="date" class="form-control form-control-sm" />
-          </div>
-          <div class="text-end ps-2">
-            <div class="small text-muted">Countdown</div>
-            <div class="countdown" id="countdown">—</div>
-          </div>
-          <div>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#taskModal" id="addTaskBtn">
-              + New Task
-            </button>
-          </div>
-        </div>
+      <div>
+        <div class="title">Wedding Checklist</div>
+        <div class="sub">จัดการสิ่งที่ต้องทำ — พร้อม timeline และ countdown</div>
+      </div>
+
+      <div class="countdownWrap" id="countWrap">
+        <div class="countdown" id="countdown">—</div>
+        <div class="wdate tiny">วางวันงาน: <span id="wdateText">—</span></div>
       </div>
     </div>
 
     <!-- Timeline -->
-    <div class="mb-3">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <div>
-          <strong>Timeline</strong>
-          <div class="small text-muted">มุมมองแบบช่วงเวลา (6m → day)</div>
-        </div>
-        <div class="d-flex gap-2 align-items-center">
-          <select id="filterSelect" class="form-select form-select-sm">
-            <option value="all">All statuses</option>
-            <option value="on">On Time</option>
-            <option value="almost">Almost Due</option>
-            <option value="late">Too Late</option>
-            <option value="completed">Completed</option>
-          </select>
-          <select id="sortSelect" class="form-select form-select-sm">
-            <option value="asc">Sort: Oldest due</option>
-            <option value="desc">Sort: Nearest due</option>
-          </select>
-        </div>
+    <div class="timelineWrap">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-weight:700">Timeline</div>
+        <div class="tiny muted">6m → Day</div>
       </div>
 
-      <div class="timeline" id="timelineBar" aria-hidden="false">
-        <!-- segments inserted by JS -->
+      <div class="timelineRow" id="timelineRow">
+        <!-- segments inserted dynamically -->
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="control-chip" id="filterChip">ทั้งหมด</div>
+      <div class="control-chip" id="sortChip">Sort: Oldest</div>
+      <div style="margin-left:auto; display:flex; gap:8px;">
+        <button class="btn-glass" id="loadSample">ตัวอย่าง</button>
+        <button class="btn-glass" id="resetAll">ล้าง</button>
       </div>
     </div>
 
     <!-- Task list -->
-    <div id="tasksContainer" class="row gy-3">
-      <!-- cards inserted by JS -->
+    <div class="taskList" id="taskList">
+      <!-- cards added here -->
     </div>
 
-    <!-- Empty state -->
-    <div id="emptyState" class="text-center text-muted small mt-4 d-none">
-      ยังไม่มีรายการ ถ้าต้องการลอง ให้คลิก "New Task" เพื่อเพิ่มรายการ หรือกดปุ่ม "รีเซ็ตตัวอย่าง" ด้านล่าง
-      <div class="mt-2">
-        <button class="btn btn-outline-secondary btn-sm" id="loadSampleBtn">โหลดตัวอย่างเริ่มต้น</button>
-        <button class="btn btn-outline-danger btn-sm" id="clearAllBtn">ล้างทั้งหมด</button>
-      </div>
+    <!-- empty -->
+    <div class="muted tiny" id="emptyNote" style="text-align:center;margin-top:18px;display:none;">
+      ยังไม่มีรายการ — กดปุ่ม + เพื่อเพิ่มรายการแรก
     </div>
-
-    <div class="text-center mt-4 mb-5 small text-muted">Built with ❤️ — responsive & localStorage</div>
   </div>
 
-  <!-- Task Modal (Add/Edit) -->
+  <!-- Floating Add Button -->
+  <button class="fab" id="fab" aria-label="Add Task">
+    <!-- plus icon -->
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+      <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  </button>
+
+  <!-- Modal (Bootstrap) for add/edit -->
   <div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
       <form class="modal-content" id="taskForm">
-        <div class="modal-header">
-          <h5 class="modal-title" id="taskModalTitle">New Task</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-header" style="border-bottom:none;">
+          <h5 class="modal-title" id="modalTitle">New Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <input type="hidden" id="taskId" />
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">ชื่อ (Task Title)</label>
-              <input id="taskTitle" class="form-control" required />
+        <div class="modal-body" style="padding-top:0;">
+          <input type="hidden" id="taskId">
+          <div class="mb-2">
+            <label class="form-label small">ชื่องาน</label>
+            <input id="taskTitle" class="form-control form-control-lg" placeholder="เช่น จองสถานที่" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">วันที่ควรทำเสร็จ</label>
+            <input id="taskDue" type="date" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">รายละเอียด (ไม่บังคับ)</label>
+            <textarea id="taskDesc" class="form-control" rows="3" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <div>
+              <label class="form-label small mb-1">สถานะเริ่มต้น</label>
+              <select id="taskStatus" class="form-select">
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+              </select>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">วันที่ควรทำเสร็จ (Due Date)</label>
-              <input id="taskDue" type="date" class="form-control" required />
-            </div>
-            <div class="col-12">
-              <label class="form-label">รายละเอียด</label>
-              <textarea id="taskDesc" rows="3" class="form-control" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
-            </div>
-            <div class="col-12 d-flex gap-3 align-items-center">
-              <div>
-                <label class="form-label mb-0">สถานะเริ่มต้น</label>
-                <select id="taskStatusSelect" class="form-select form-select-sm">
-                  <option value="pending">Pending</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
-              <div class="ms-auto text-end">
-                <div class="small text-muted">หมายเหตุ</div>
-                <div class="text-muted small">ระบบจะคำนวณสถานะ OnTime/Almost/Late อัตโนมัติตามวันที่ปัจจุบัน</div>
-              </div>
-            </div>
+            <div style="margin-left:auto" class="tiny muted">ระบบจะคำนวณสถานะ On/Almost/Late ให้โดยอัตโนมัติ</div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary">บันทึก</button>
+        <div class="modal-footer" style="border-top:none;">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-accent">บันทึก</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Bootstrap & scripts -->
+  <!-- Date selector bottom sheet (small) -->
+  <div style="position:fixed;left:14px;bottom:18px; z-index:1100;">
+    <input id="weddingDateInput" type="date" style="border:none; background:transparent; font-weight:600; color:#111827;" title="Set Wedding Date">
+  </div>
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /***********************
-     * Wedding Checklist Manager
-     * - single-file app using localStorage
-     * - features: add/edit/delete, mark complete, filter, sort
-     * - timeline visualization and countdown
-     ***********************/
+    /*****************************************
+     * Wedding Checklist Manager — Single-file
+     * Modern mobile-first UI (glassmorphism)
+     * Features:
+     * - add/edit/delete tasks (modal)
+     * - mark complete/unmark
+     * - timeline with colored pins
+     * - categories (6m/3m/1m/1w/day)
+     * - auto status: on / almost / late / completed
+     * - filter & sort
+     * - countdown to wedding date
+     * - localStorage persistence
+     *****************************************/
 
-    // ---------- Constants & storage keys ----------
-    const STORAGE_KEY = 'weddingTasks_v1';
-    const STORAGE_WEDDING_DATE = 'weddingDate_v1';
+    /* --------------------- Storage keys --------------------- */
+    const KEY_TASKS = 'wcm_tasks_v1';
+    const KEY_WEDDING = 'wcm_wedding_v1';
 
-    // ---------- Utility helpers ----------
-    const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    /* --------------------- helpers --------------------- */
+    const $ = sel => document.querySelector(sel);
+    const uid = () => 'id_' + Math.random().toString(36).slice(2,9);
+    const pad = n => n.toString().padStart(2,'0');
 
-    function uid() {
-      return 't_' + Math.random().toString(36).slice(2,9);
-    }
-    function toDateISO(d) {
-      // ensure yyyy-mm-dd
-      return new Date(d).toISOString().slice(0,10);
-    }
-    function daysBetween(a, b) {
-      // days from a to b (b - a)
+    function iso(d){ return new Date(d).toISOString().slice(0,10); }
+    function daysBetween(a,b){ // b - a
       const MS = 1000*60*60*24;
-      const diff = Math.floor((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate()) - Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/MS);
-      return diff;
+      return Math.floor((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate()) - Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/MS);
     }
 
-    // ---------- Initial sample data (user asked to expand) ----------
-    const SAMPLE_WEDDING_DATE = (() => {
+    /* --------------------- initial sample data (relative to wedding date) --------------------- */
+    // default wedding date 6 months from now
+    const defaultWedding = (() => {
       const d = new Date();
-      d.setMonth(d.getMonth() + 6); // default 6 months from now
-      return toDateISO(d);
+      d.setMonth(d.getMonth()+6);
+      return iso(d);
     })();
 
-    const SAMPLE_TASKS = [
-      // 6 months before
-      { id: uid(), title: "กำหนดงบประมาณ", desc: "ตั้งงบรวมและแยกเป็นหมวด (สถานที่, อาหาร, แต่งตัว, ถ่ายภาพ)", due: relativeDate(-180), status: "pending" },
-      { id: uid(), title: "จองสถานที่", desc: "ติดต่อสถานที่และมัดจำ", due: relativeDate(-170), status: "pending" },
-      { id: uid(), title: "กำหนดธีมงาน", desc: "เลือกโทนสีและธีมหลัก", due: relativeDate(-165), status: "pending" },
-
-      // 3 months before
-      { id: uid(), title: "ออกแบบของที่ระลึก", desc: "ออกแบบและสั่งตัวอย่าง", due: relativeDate(-95), status: "pending" },
-      { id: uid(), title: "จ้างช่างภาพ", desc: "คัดเลือกช่างภาพและแพ็กเกจ", due: relativeDate(-92), status: "pending" },
-      { id: uid(), title: "วางแผนเมนู", desc: "ชิมเมนูและยืนยันอาหาร", due: relativeDate(-85), status: "pending" },
-
-      // 1 month before
-      { id: uid(), title: "ส่งการ์ดเชิญ", desc: "พิมพ์และส่งบัตรเชิญ", due: relativeDate(-30), status: "pending" },
-      { id: uid(), title: "ยืนยันผู้ให้บริการ", desc: "ยืนยันดีลกับทุกผู้ให้บริการ (ช่างภาพ, แคเทอริ่ง)", due: relativeDate(-28), status: "pending" },
-
-      // 1 week before
-      { id: uid(), title: "ตรวจสอบสภาพอากาศ", desc: "เช็กพยากรณ์ และวางแผนสำรอง", due: relativeDate(-6), status: "pending" },
-      { id: uid(), title: "เตรียมของใช้", desc: "ของใช้จำเป็น, ชุดสำรอง, ยาประจำ", due: relativeDate(-5), status: "pending" },
-
-      // Day of
-      { id: uid(), title: "ติดตั้งสถานที่", desc: "ตกแต่งสถานที่ และเช็กแสงสี", due: relativeDate(0), status: "pending" },
-      { id: uid(), title: "ต้อนรับแขก", desc: "เตรียมทีมต้อนรับและซักซ้อมหน้าที่", due: relativeDate(0), status: "pending" },
-
-      // Additional helpful items
-      { id: uid(), title: "เตรียมสคริปต์พิธี", desc: "วางลำดับพิธีและตัวอย่างคำพูด", due: relativeDate(-15), status: "pending" },
-      { id: uid(), title: "เลือกเพลง", desc: "รวมเพลงสำหรับพิธีและงานเลี้ยง", due: relativeDate(-40), status: "pending" },
-      { id: uid(), title: "จองรถรับส่ง", desc: "จองรถรับส่งแขก VIP", due: relativeDate(-25), status: "pending" },
-    ];
-
-    // relativeDate(n) returns a date string relative to SAMPLE_WEDDING_DATE.
-    // n is days before wedding (negative for before).
-    function relativeDate(daysBefore) {
-      const wedding = new Date(SAMPLE_WEDDING_DATE);
-      const due = new Date(wedding.getFullYear(), wedding.getMonth(), wedding.getDate());
-      due.setDate(due.getDate() + daysBefore);
-      return toDateISO(due);
+    function relativeToWedding(weddingISO, daysBefore){
+      const w = new Date(weddingISO + 'T00:00:00');
+      w.setDate(w.getDate() + daysBefore); // daysBefore negative -> before wedding
+      return iso(w);
     }
 
-    // ---------- App state ----------
-    let tasks = [];
-    let weddingDate = localStorage.getItem(STORAGE_WEDDING_DATE) || SAMPLE_WEDDING_DATE;
+    const SAMPLE_TASKS = [
+      {id: uid(), title:'กำหนดงบประมาณ', desc:'แยกหมวด เช่น สถานที่, อาหาร, ชุด', dueOffset:-180, status:'pending'},
+      {id: uid(), title:'จองสถานที่', desc:'ติดต่อสถานที่และวางมัดจำ', dueOffset:-170, status:'pending'},
+      {id: uid(), title:'กำหนดธีมงาน', desc:'เลือกโทนสีและสไตล์', dueOffset:-165, status:'pending'},
+      {id: uid(), title:'จ้างช่างภาพ', desc:'คัดเลือกแพ็กเกจ', dueOffset:-92, status:'pending'},
+      {id: uid(), title:'วางแผนเมนู', desc:'ชิมเมนูและเลือกเมนูหลัก', dueOffset:-85, status:'pending'},
+      {id: uid(), title:'ส่งการ์ดเชิญ', desc:'พิมพ์และส่งบัตรเชิญ', dueOffset:-30, status:'pending'},
+      {id: uid(), title:'ยืนยันผู้ให้บริการ', desc:'ยืนยัน DJ, Catering, Photographer', dueOffset:-28, status:'pending'},
+      {id: uid(), title:'ตรวจสอบสภาพอากาศ', desc:'เช็กพยากรณ์และแผนสำรอง', dueOffset:-6, status:'pending'},
+      {id: uid(), title:'เตรียมของใช้', desc:'ของใช้จำเป็น และชุดสำรอง', dueOffset:-5, status:'pending'},
+      {id: uid(), title:'ติดตั้งสถานที่', desc:'ตกแต่งสถานที่และเช็กระบบไฟ', dueOffset:0, status:'pending'},
+      {id: uid(), title:'ต้อนรับแขก', desc:'กำหนดหน้าที่ทีมต้อนรับ', dueOffset:0, status:'pending'},
+      {id: uid(), title:'เตรียมสคริปต์พิธี', desc:'ลำดับพิธีและคำพูด', dueOffset:-15, status:'pending'},
+      {id: uid(), title:'เลือกเพลง', desc:'รวมเพลงพิธีและเพลงเปิดงาน', dueOffset:-40, status:'pending'},
+    ];
 
-    // ---------- DOM elements ----------
-    const timelineBar = $('#timelineBar');
-    const tasksContainer = $('#tasksContainer');
+    /* --------------------- App state --------------------- */
+    let tasks = [];
+    let weddingDate = localStorage.getItem(KEY_WEDDING) || defaultWedding;
+    let filterMode = 'all'; // on / almost / late / completed / all
+    let sortMode = 'asc'; // asc = oldest -> newest
+
+    /* --------------------- DOM refs --------------------- */
+    const timelineRow = $('#timelineRow');
+    const taskList = $('#taskList');
+    const emptyNote = $('#emptyNote');
+    const countdown = $('#countdown');
+    const wdateText = $('#wdateText');
+    const weddingDateInput = $('#weddingDateInput');
+    const fab = $('#fab');
+    const filterChip = $('#filterChip');
+    const sortChip = $('#sortChip');
+
+    /* Bootstrap modal */
     const taskModalEl = document.getElementById('taskModal');
     const taskModal = new bootstrap.Modal(taskModalEl);
     const taskForm = $('#taskForm');
-    const taskModalTitle = $('#taskModalTitle');
+    const modalTitle = $('#modalTitle');
 
-    const weddingDateInput = $('#weddingDateInput');
-    const countdownEl = $('#countdown');
-    const filterSelect = $('#filterSelect');
-    const sortSelect = $('#sortSelect');
+    // form fields
+    const fId = $('#taskId');
+    const fTitle = $('#taskTitle');
+    const fDue = $('#taskDue');
+    const fDesc = $('#taskDesc');
+    const fStatus = $('#taskStatus');
 
-    const loadSampleBtn = $('#loadSampleBtn');
-    const clearAllBtn = $('#clearAllBtn');
-    const addTaskBtn = $('#addTaskBtn');
-
-    // ---------- Initialization ----------
-    function loadFromStorage() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        try {
-          tasks = JSON.parse(raw);
-        } catch(e) {
-          tasks = [];
-        }
+    /* --------------------- Load / Save --------------------- */
+    function load(){
+      const raw = localStorage.getItem(KEY_TASKS);
+      if(raw){
+        try { tasks = JSON.parse(raw); }
+        catch(e){ tasks = []; }
       } else {
-        tasks = [];
+        // seed sample tasks mapped to wedding date
+        tasks = SAMPLE_TASKS.map(t => ({
+          id: t.id,
+          title: t.title,
+          desc: t.desc,
+          due: relativeToWedding(weddingDate, t.dueOffset),
+          status: t.status
+        }));
+        save();
       }
-      const w = localStorage.getItem(STORAGE_WEDDING_DATE);
-      if (w) weddingDate = w;
+      weddingDate = localStorage.getItem(KEY_WEDDING) || weddingDate;
+    }
+    function save(){
+      localStorage.setItem(KEY_TASKS, JSON.stringify(tasks));
+      localStorage.setItem(KEY_WEDDING, weddingDate);
     }
 
-    function saveToStorage() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-      localStorage.setItem(STORAGE_WEDDING_DATE, weddingDate);
-    }
-
-    function seedSampleData() {
-      tasks = SAMPLE_TASKS.map(t => ({...t})); // copy
-      weddingDate = SAMPLE_WEDDING_DATE;
-      saveToStorage();
-      renderAll();
-    }
-
-    // ---------- Status Calculation ----------
-    // status codes: 'on' (On Time), 'almost' (Almost Due), 'late' (Too Late)
-    // completed tasks get 'completed'
-    function calcStatusForTask(task) {
-      if (!task || !task.due) return 'on';
-      if (task.status === 'completed') return 'completed';
-
+    /* --------------------- Status calculation --------------------- */
+    // returns 'on' / 'almost' / 'late' / 'completed'
+    function calcStatus(t){
+      if(t.status === 'completed') return 'completed';
+      if(!t.due) return 'on';
       const today = new Date();
-      const due = new Date(task.due + 'T00:00:00');
+      const due = new Date(t.due + 'T00:00:00');
       const daysLeft = daysBetween(today, due);
-
-      // Define threshold for "Almost Due": within 3 days (including today)
-      // If due is in the past (daysLeft < 0) => Too Late
-      if (daysLeft < 0) return 'late';
-      if (daysLeft <= 3) return 'almost';
+      if(daysLeft < 0) return 'late';
+      if(daysLeft <= 3) return 'almost';
       return 'on';
     }
 
-    // ---------- Category (time-before-event) ----------
-    // Categorize by days before wedding
-    function categoryForTask(task) {
-      if (!weddingDate) return 'Unscheduled';
-      const wed = new Date(weddingDate + 'T00:00:00');
-      const due = new Date(task.due + 'T00:00:00');
-      const daysBefore = daysBetween(due, wed); // positive if due is before wedding
-
-      if (daysBefore >= 180) return '6 months before';
-      if (daysBefore >= 90) return '3 months before';
-      if (daysBefore >= 30) return '1 month before';
-      if (daysBefore >= 7) return '1 week before';
-      if (daysBefore >= 0) return 'day of event';
+    /* --------------------- Category (time before wedding) --------------------- */
+    function categoryLabel(t){
+      if(!weddingDate || !t.due) return 'Unscheduled';
+      const w = new Date(weddingDate + 'T00:00:00');
+      const due = new Date(t.due + 'T00:00:00');
+      const daysBefore = daysBetween(due, w); // positive if due before wedding
+      if(daysBefore >= 180) return '6 months before';
+      if(daysBefore >= 90) return '3 months before';
+      if(daysBefore >= 30) return '1 month before';
+      if(daysBefore >= 7) return '1 week before';
+      if(daysBefore >= 0) return 'day of event';
       return 'After event';
     }
 
-    // ---------- Render timeline ----------
-    function renderTimeline() {
-      timelineBar.innerHTML = '';
-      // segments: 6m / 3m / 1m / 1w / day
-      const segs = [
-        {key:'6 months before', label: '6 months'},
-        {key:'3 months before', label: '3 months'},
-        {key:'1 month before', label: '1 month'},
-        {key:'1 week before', label: '1 week'},
-        {key:'day of event', label: 'Day'},
+    /* --------------------- Timeline rendering --------------------- */
+    function renderTimeline(){
+      timelineRow.innerHTML = '';
+      // segments: 6m/3m/1m/1w/day — widths proportional
+      const segments = [
+        {key:'6 months', width:180, tone:'seg-blue'},
+        {key:'3 months', width:90, tone:'seg-blue'},
+        {key:'1 month', width:30, tone:'seg-yellow'},
+        {key:'1 week', width:7, tone:'seg-red'},
+        {key:'day', width:1, tone:'seg-green'}
       ];
+      const total = segments.reduce((a,b)=>a+b.width,0);
 
-      // compute width of each segment proportional to days window:
-      // 6m: 180 days, 3m: 90, 1m:30, 1w:7, day:1
-      const widths = [180,90,30,7,1];
-      const total = widths.reduce((a,b)=>a+b,0);
-      segs.forEach((s, idx) => {
-        const w = (widths[idx] / total) * 100;
-        const seg = document.createElement('div');
-        seg.className = 'timeline-segment';
-        seg.style.width = w + '%';
-        seg.innerHTML = `<div class="segment-label">${s.label}</div>`;
-        seg.dataset.key = s.key;
-        timelineBar.appendChild(seg);
+      segments.forEach(seg=>{
+        const el = document.createElement('div');
+        el.className = 'segment ' + seg.tone;
+        el.style.flex = String(seg.width);
+        el.innerHTML = `<div style="pointer-events:none">${seg.key}</div>`;
+        timelineRow.appendChild(el);
       });
 
-      // place pins for tasks proportionally inside the whole timeline: from 6 months-before point to day
-      // We'll map relative position based on daysBefore (180 → 0% ... 0 → 100%)
-      const allTasks = visibleTasksForTimeline();
-      const totalDaysSpan = 180; // from 180 days before to event
-      allTasks.forEach(t => {
-        if (!t.due) return;
+      // pins: place relative based on days before wedding (180 -> 0%)
+      const totalSpan = 180;
+      tasks.forEach(t=>{
+        if(!t.due) return;
         const due = new Date(t.due + 'T00:00:00');
-        const wed = new Date(weddingDate + 'T00:00:00');
-        const daysBefore = Math.round(daysBetween(due, wed));
-        // clamp
-        let pos = (180 - daysBefore) / totalDaysSpan; // 0..1
-        pos = Math.max(0, Math.min(1, pos));
-
+        const w = new Date(weddingDate + 'T00:00:00');
+        let daysBefore = daysBetween(due, w);
+        // clamp between 0..180
+        daysBefore = Math.max(Math.min(daysBefore, totalSpan), 0);
+        let pos = (totalSpan - daysBefore) / totalSpan; // 0..1 (earlier -> small pos)
+        // position in px relative to timelineRow width
         const pin = document.createElement('div');
-        pin.className = 'task-pin';
-        const st = calcStatusForTask(t);
-        if (st === 'on') pin.style.background = 'rgba(59,130,246,0.9)';       // blue
-        if (st === 'almost') pin.style.background = 'rgba(234,179,8,0.9)';    // yellow
-        if (st === 'late') pin.style.background = 'rgba(239,68,68,0.9)';      // red
-        if (st === 'completed') pin.style.background = 'rgba(34,197,94,0.9)'; // green
-        pin.title = `${t.title} — due ${t.due} (${categoryForTask(t)})`;
-
-        // position relative to timelineBar
-        const leftPercent = (pos * 100).toFixed(2) + '%';
-        pin.style.left = leftPercent;
-        pin.style.zIndex = 5;
-        timelineBar.appendChild(pin);
+        pin.className = 'pin';
+        const s = calcStatus(t);
+        if(s === 'on') pin.style.background = 'linear-gradient(180deg,#5cc8ff,#6b5cff)';
+        if(s === 'almost') pin.style.background = 'linear-gradient(180deg,#ffd57a,#ffb06b)';
+        if(s === 'late') pin.style.background = 'linear-gradient(180deg,#ff8a8a,#ff4d4d)';
+        if(s === 'completed') pin.style.background = 'linear-gradient(180deg,#7ef0b2,#3bd07a)';
+        // compute left based on container width after layout
+        timelineRow.appendChild(pin);
+        // delay compute after appended and layout (use rAF)
+        requestAnimationFrame(()=> {
+          const rect = timelineRow.getBoundingClientRect();
+          const x = rect.left + pos * rect.width;
+          pin.style.left = (pos*100) + '%';
+          pin.title = `${t.title} — ${t.due} (${categoryLabel(t)})`;
+          pin.dataset.id = t.id;
+          pin.style.opacity = '0.98';
+        });
       });
     }
 
-    function visibleTasksForTimeline() {
-      // show all tasks that are within 180 days before wedding, else clamp
-      return tasks.slice();
-    }
-
-    // ---------- Render task list ----------
-    function renderTasks() {
-      tasksContainer.innerHTML = '';
-
-      const filter = filterSelect.value;
-      const sort = sortSelect.value;
-
+    /* --------------------- Render tasks list --------------------- */
+    function renderTasks(){
+      taskList.innerHTML = '';
+      // filter & sort
       let list = tasks.slice();
-
-      // filter
-      if (filter !== 'all') {
+      if(filterMode !== 'all'){
         list = list.filter(t => {
-          const st = calcStatusForTask(t);
-          return filter === 'completed' ? st === 'completed' : st === filter;
+          const s = calcStatus(t);
+          return s === filterMode;
         });
       }
-
-      // sort
       list.sort((a,b) => {
         const da = new Date(a.due + 'T00:00:00');
         const db = new Date(b.due + 'T00:00:00');
-        return sort === 'asc' ? da - db : db - da;
+        return sortMode === 'asc' ? da - db : db - da;
       });
 
-      if (list.length === 0) {
-        $('#emptyState').classList.remove('d-none');
+      if(list.length === 0){
+        emptyNote.style.display = 'block';
       } else {
-        $('#emptyState').classList.add('d-none');
+        emptyNote.style.display = 'none';
       }
 
-      list.forEach(t => {
-        const col = document.createElement('div');
-        col.className = 'col-12 col-md-6 col-lg-4';
-
-        const st = calcStatusForTask(t);
-        const statusBadge = (() => {
-          if (st === 'on') return `<span class="badge-status status-on">On Time</span>`;
-          if (st === 'almost') return `<span class="badge-status status-almost">Almost Due</span>`;
-          if (st === 'late') return `<span class="badge-status status-late">Too Late</span>`;
-          if (st === 'completed') return `<span class="badge-status status-complete">Completed</span>`;
-          return `<span class="badge-status status-on">On Time</span>`;
-        })();
-
+      list.forEach(t=>{
+        const st = calcStatus(t);
         const card = document.createElement('div');
-        card.className = 'card task-card shadow-sm h-100';
+        card.className = 'taskCard';
+        const completeClass = t.status === 'completed' ? 'completedTitle' : '';
+        const dueLabel = t.due ? t.due : 'ไม่ระบุวัน';
         card.innerHTML = `
-          <div class="card-body d-flex flex-column">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <h5 class="card-title mb-1 ${t.status === 'completed' ? 'completed' : ''}">${escapeHtml(t.title)}</h5>
-                <div class="small text-muted">${escapeHtml(t.desc || '')}</div>
-              </div>
-              <div class="text-end">
-                <div>${statusBadge}</div>
-                <div class="small text-muted mt-2">${t.due}</div>
-              </div>
-            </div>
-
-            <div class="mt-3 d-flex gap-2 align-items-center mt-auto">
-              <button class="btn btn-sm btn-outline-success markCompleteBtn">${t.status === 'completed' ? 'Unmark' : 'Mark Complete'}</button>
-              <button class="btn btn-sm btn-outline-primary editBtn">Edit</button>
-              <button class="btn btn-sm btn-outline-danger deleteBtn ms-auto">Delete</button>
-            </div>
+          <div class="taskIcon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="#111827" stroke-opacity="0.08" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div class="taskBody">
+            <div class="taskTitle ${completeClass}">${escapeHtml(t.title)}</div>
+            <div class="taskMeta">${escapeHtml(t.desc||'')} <div style="display:inline-block;margin-left:6px" class="label-pill">${dueLabel}</div></div>
+            <div style="margin-top:8px" class="tiny muted">หมวด: ${categoryLabel(t)}</div>
+          </div>
+          <div class="taskActions">
+            <button class="btn-glass markBtn">${t.status === 'completed' ? 'Unmark' : 'Done'}</button>
+            <button class="btn-glass" data-edit="${t.id}">Edit</button>
+            <button class="btn-glass" data-del="${t.id}">Delete</button>
           </div>
         `;
-
         // events
-        card.querySelector('.editBtn').addEventListener('click', () => openEditModal(t.id));
-        card.querySelector('.deleteBtn').addEventListener('click', () => {
-          if (confirm('ลบรายการนี้ใช่หรือไม่?')) {
-            tasks = tasks.filter(x => x.id !== t.id);
-            saveToStorage();
-            renderAll();
+        const markBtn = card.querySelector('.markBtn');
+        markBtn.addEventListener('click', ()=>{
+          t.status = (t.status === 'completed') ? 'pending' : 'completed';
+          save(); renderAll();
+        });
+        card.querySelector('[data-edit]')?.addEventListener('click', ()=>{
+          openEditModal(t.id);
+        });
+        card.querySelector('[data-del]')?.addEventListener('click', ()=>{
+          if(confirm('ลบรายการนี้?')) {
+            tasks = tasks.filter(x=> x.id !== t.id);
+            save(); renderAll();
           }
         });
-        card.querySelector('.markCompleteBtn').addEventListener('click', (e) => {
-          t.status = t.status === 'completed' ? 'pending' : 'completed';
-          saveToStorage();
-          renderAll();
-        });
 
-        col.appendChild(card);
-        tasksContainer.appendChild(col);
+        taskList.appendChild(card);
       });
     }
 
-    // ---------- Helpers ----------
-    function escapeHtml(str){ if(!str) return ''; return (''+str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-
-    // ---------- Form handling ----------
-    addTaskBtn.addEventListener('click', () => {
-      $('#taskId').value = '';
-      $('#taskTitle').value = '';
-      $('#taskDesc').value = '';
-      $('#taskDue').value = '';
-      $('#taskStatusSelect').value = 'pending';
-      taskModalTitle.textContent = 'New Task';
-      taskModal.show();
-    });
-
-    function openEditModal(id) {
-      const t = tasks.find(x => x.id === id);
-      if (!t) return;
-      $('#taskId').value = t.id;
-      $('#taskTitle').value = t.title;
-      $('#taskDesc').value = t.desc;
-      $('#taskDue').value = t.due;
-      $('#taskStatusSelect').value = t.status || 'pending';
-      taskModalTitle.textContent = 'Edit Task';
-      taskModal.show();
-    }
-
-    taskForm.addEventListener('submit', (ev) => {
-      ev.preventDefault();
-      const id = $('#taskId').value;
-      const title = $('#taskTitle').value.trim();
-      const desc = $('#taskDesc').value.trim();
-      const due = $('#taskDue').value;
-      const statusSel = $('#taskStatusSelect').value;
-
-      if (!title || !due) {
-        alert('กรุณากรอกชื่อและวันที่');
-        return;
-      }
-
-      if (id) {
-        // edit
-        const t = tasks.find(x => x.id === id);
-        if (t) {
-          t.title = title;
-          t.desc = desc;
-          t.due = due;
-          t.status = statusSel === 'completed' ? 'completed' : (t.status === 'completed' ? 'completed' : 'pending');
-        }
-      } else {
-        // new
-        const newTask = { id: uid(), title, desc, due, status: statusSel === 'completed' ? 'completed' : 'pending' };
-        tasks.push(newTask);
-      }
-
-      saveToStorage();
-      renderAll();
-      taskModal.hide();
-    });
-
-    // ---------- Wedding date & countdown ----------
-    function renderWeddingDateInput(){
-      weddingDateInput.value = weddingDate;
-      weddingDateInput.addEventListener('change', () => {
-        weddingDate = weddingDateInput.value;
-        saveToStorage();
-        renderAll();
-      });
-    }
-
-    function updateCountdown() {
-      if (!weddingDate) {
-        countdownEl.textContent = '—';
+    /* --------------------- countdown --------------------- */
+    function updateCountdown(){
+      if(!weddingDate){
+        countdown.textContent = '—';
+        wdateText.textContent = '—';
         return;
       }
       const now = new Date();
       const wed = new Date(weddingDate + 'T00:00:00');
       const diff = wed - now;
-      if (diff <= 0) {
-        countdownEl.textContent = 'งานเริ่มแล้วหรือผ่านไปแล้ว 🎉';
+      if(diff <= 0){
+        countdown.textContent = 'วันงานถึงแล้ว 🎉';
+        wdateText.textContent = weddingDate;
         return;
       }
       const d = Math.floor(diff / (1000*60*60*24));
       const h = Math.floor((diff / (1000*60*60)) % 24);
       const m = Math.floor((diff / (1000*60)) % 60);
       const s = Math.floor((diff / 1000) % 60);
-      countdownEl.textContent = `${d}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+      countdown.textContent = `${d}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+      wdateText.textContent = weddingDate;
     }
-    function pad(n){ return n.toString().padStart(2,'0'); }
-
-    // update countdown every 1s
     setInterval(updateCountdown, 1000);
 
-    // ---------- Filters / Sorting ----------
-    filterSelect.addEventListener('change', () => renderAll());
-    sortSelect.addEventListener('change', () => renderAll());
+    /* --------------------- UI helpers --------------------- */
+    function escapeHtml(s){ if(!s) return ''; return (''+s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
-    // ---------- Buttons ----------
-    loadSampleBtn.addEventListener('click', () => {
-      if (!confirm('โหลดตัวอย่างจะเขียนทับข้อมูลปัจจุบัน ใช่หรือไม่?')) return;
-      seedSampleData();
+    /* --------------------- Modal handling --------------------- */
+    fab.addEventListener('click', ()=>{
+      fId.value = '';
+      fTitle.value = '';
+      fDesc.value = '';
+      fDue.value = '';
+      fStatus.value = 'pending';
+      modalTitle.textContent = 'Add Task';
+      taskModal.show();
     });
-    clearAllBtn.addEventListener('click', () => {
-      if (!confirm('ล้างข้อมูลทั้งหมดจาก localStorage ใช่หรือไม่?')) return;
-      tasks = [];
-      weddingDate = SAMPLE_WEDDING_DATE;
-      saveToStorage();
+
+    function openEditModal(id){
+      const t = tasks.find(x=>x.id===id);
+      if(!t) return;
+      fId.value = t.id;
+      fTitle.value = t.title;
+      fDesc.value = t.desc;
+      fDue.value = t.due;
+      fStatus.value = t.status || 'pending';
+      modalTitle.textContent = 'Edit Task';
+      taskModal.show();
+    }
+
+    taskForm.addEventListener('submit', (ev)=>{
+      ev.preventDefault();
+      const id = fId.value;
+      const title = fTitle.value.trim();
+      const desc = fDesc.value.trim();
+      const due = fDue.value;
+      const status = fStatus.value;
+      if(!title || !due){ alert('กรุณากรอกชื่อและวันที่'); return; }
+      if(id){
+        const t = tasks.find(x=>x.id===id);
+        if(t){
+          t.title = title; t.desc = desc; t.due = due; t.status = (status==='completed'? 'completed': 'pending');
+        }
+      } else {
+        tasks.push({id: uid(), title, desc, due, status: (status==='completed'? 'completed': 'pending')});
+      }
+      save(); renderAll(); taskModal.hide();
+    });
+
+    /* --------------------- Filter & Sort quick actions --------------------- */
+    filterChip.addEventListener('click', ()=>{
+      // cycle modes
+      const modes = ['all','on','almost','late','completed'];
+      const labels = {'all':'ทั้งหมด','on':'On Time','almost':'Almost','late':'Too Late','completed':'Completed'};
+      const i = modes.indexOf(filterMode);
+      filterMode = modes[(i+1)%modes.length];
+      filterChip.textContent = labels[filterMode] || 'ทั้งหมด';
+      renderAll();
+    });
+    sortChip.addEventListener('click', ()=>{
+      sortMode = sortMode === 'asc' ? 'desc' : 'asc';
+      sortChip.textContent = sortMode === 'asc' ? 'Sort: Oldest' : 'Sort: Nearest';
       renderAll();
     });
 
-    // ---------- Rendering helper ----------
-    function renderAll() {
-      loadFromStorage();
-      renderWeddingDateInput();
+    /* --------------------- Load / Reset sample and clear --------------------- */
+    $('#loadSample').addEventListener('click', ()=>{
+      if(!confirm('โหลดตัวอย่างจะเขียนทับข้อมูลปัจจุบัน ใช่หรือไม่?')) return;
+      // map SAMPLE_TASKS with current wedding date
+      tasks = SAMPLE_TASKS.map(t => ({
+        id: uid(), title: t.title, desc: t.desc, due: relativeToWedding(weddingDate, t.dueOffset), status:t.status
+      }));
+      save(); renderAll();
+    });
+    $('#resetAll').addEventListener('click', ()=>{
+      if(!confirm('ล้างข้อมูลทั้งหมดจาก localStorage ใช่หรือไม่?')) return;
+      tasks = [];
+      weddingDate = defaultWedding;
+      localStorage.removeItem(KEY_TASKS);
+      localStorage.removeItem(KEY_WEDDING);
+      save(); renderAll();
+    });
+
+    /* --------------------- wedding date input --------------------- */
+    weddingDateInput.value = weddingDate;
+    weddingDateInput.addEventListener('change', ()=>{
+      weddingDate = weddingDateInput.value || defaultWedding;
+      // when wedding date changes, shift tasks if they were sample? we keep dates as-is.
+      save(); renderAll();
+    });
+
+    /* --------------------- render all --------------------- */
+    function renderAll(){
+      load();
       renderTimeline();
       renderTasks();
       updateCountdown();
-      saveToStorage();
+      // reflect wedding date input text
+      weddingDateInput.value = weddingDate;
     }
 
-    // ---------- On first load, if no data, seed samples ----------
-    loadFromStorage();
-    if (!localStorage.getItem(STORAGE_KEY) || tasks.length === 0) {
-      // seed sample tasks (but do not overwrite if user had set weddingDate)
-      tasks = SAMPLE_TASKS.map(t => ({...t}));
-      saveToStorage();
-    }
+    /* --------------------- initial load --------------------- */
+    load();
     renderAll();
 
-    // ---------- small helper: keep stored weddingDate if none set by user ----------
-    if (!localStorage.getItem(STORAGE_WEDDING_DATE)) {
-      localStorage.setItem(STORAGE_WEDDING_DATE, weddingDate);
-    }
+    /* --------------------- small UX: clicking on pin opens edit --------------------- */
+    timelineRow.addEventListener('click', (ev)=>{
+      const pin = ev.target.closest('.pin');
+      if(pin && pin.dataset.id){
+        openEditModal(pin.dataset.id);
+      }
+    });
 
-    // ---------- Explanation (in console) ----------
-    console.log("Wedding Checklist Manager initialized.");
-    console.log("Storage key:", STORAGE_KEY, "Wedding date key:", STORAGE_WEDDING_DATE);
-
+    /* --------------------- end --------------------- */
   </script>
 </body>
 </html>
