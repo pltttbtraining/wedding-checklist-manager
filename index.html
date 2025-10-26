@@ -31,7 +31,76 @@
                             ยืนยัน
                         </button>
                     </form>
-                    <p class="small text-muted mt-3">รหัสผ่าน: 1212312121</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal fade" id="addTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ios-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">เพิ่มรายการใหม่</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTaskForm">
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อรายการ</label>
+                            <input type="text" class="form-control ios-input" id="newTaskName" placeholder="เช่น จองช่างภาพ" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">หมวดหมู่</label>
+                            <select class="form-select ios-input" id="newTaskCategory" required>
+                                <option value="">เลือกหมวดหมู่</option>
+                                <option value="6">6 เดือนก่อนงาน</option>
+                                <option value="3">3 เดือนก่อนงาน</option>
+                                <option value="1">1 เดือนก่อนงาน</option>
+                                <option value="0.25">1 สัปดาห์ก่อนงาน</option>
+                                <option value="0">วันงาน</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">รายละเอียด</label>
+                            <textarea class="form-control ios-input" id="newTaskDescription" placeholder="รายละเอียดเพิ่มเติม" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 ios-btn">บันทึกรายการ</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Detail Modal -->
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ios-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="categoryModalTitle">รายการย่อย</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="subtaskList">
+                        <!-- Subtasks will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Tasks Modal -->
+    <div class="modal fade" id="allTasksModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ios-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">รายการทั้งหมด</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="allTasksList">
+                        <!-- All tasks will be loaded here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,16 +111,9 @@
         <!-- Header -->
         <header class="app-header">
             <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h1 class="app-title">N&N Wedding</h1>
-                        <p class="app-subtitle">1 มีนาคม 2568</p>
-                    </div>
-                    <div class="col-auto">
-                        <div class="header-icon">
-                            <i class="bi bi-heart-fill"></i>
-                        </div>
-                    </div>
+                <div class="header-card shimmer">
+                    <h1 class="app-title">N&N Wedding Checklist</h1>
+                    <p class="app-subtitle">1 มีนาคม 2568</p>
                 </div>
             </div>
         </header>
@@ -72,15 +134,15 @@
                                 <div class="countdown-label">วัน</div>
                             </div>
                             <div class="countdown-item">
-                                <div class="countdown-value" id="hours">0</div>
+                                <div class="countdown-value" id="hours">00</div>
                                 <div class="countdown-label">ชั่วโมง</div>
                             </div>
                             <div class="countdown-item">
-                                <div class="countdown-value" id="minutes">0</div>
+                                <div class="countdown-value" id="minutes">00</div>
                                 <div class="countdown-label">นาที</div>
                             </div>
                             <div class="countdown-item">
-                                <div class="countdown-value" id="seconds">0</div>
+                                <div class="countdown-value" id="seconds">00</div>
                                 <div class="countdown-label">วินาที</div>
                             </div>
                         </div>
@@ -133,7 +195,7 @@
                             </button>
                         </div>
                         <div class="col-6">
-                            <button class="action-btn ios-card" onclick="nnWedding.showAllTasks()">
+                            <button class="action-btn ios-card" id="viewAllBtn">
                                 <i class="bi bi-eye"></i>
                                 <span>ดูทั้งหมด</span>
                             </button>
@@ -164,11 +226,11 @@
                 </div>
             </section>
 
-            <!-- Tasks List -->
-            <section class="tasks-section">
+            <!-- Categories List -->
+            <section class="categories-section">
                 <div class="container-fluid">
-                    <div id="tasksContainer">
-                        <!-- Tasks will be loaded here -->
+                    <div id="categoriesContainer">
+                        <!-- Categories will be loaded here -->
                     </div>
                 </div>
             </section>
