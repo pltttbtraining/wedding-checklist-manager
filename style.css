@@ -37,37 +37,41 @@ body.ios-theme {
 
 /* Header */
 .app-header {
-    background: var(--ios-card);
     padding: 1rem 1rem 0.5rem;
-    border-bottom: 1px solid var(--ios-gray-5);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(20px);
+}
+
+.header-card {
+    background: var(--ios-blue);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+    text-align: center;
 }
 
 .app-title {
     font-size: 1.75rem;
     font-weight: 700;
     margin: 0;
-    color: #000;
+    color: white;
 }
 
 .app-subtitle {
     font-size: 0.9rem;
-    color: var(--ios-gray-1);
-    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0.5rem 0 0 0;
 }
 
-.header-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--ios-blue);
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
+/* Shimmer Animation */
+@keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: 200px 0; }
+}
+
+.shimmer {
+    background: linear-gradient(90deg, var(--ios-blue) 0%, #5AA9FF 50%, var(--ios-blue) 100%);
+    background-size: 200px 100%;
+    animation: shimmer 2s infinite;
 }
 
 /* iOS Cards */
@@ -116,12 +120,24 @@ body.ios-theme {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
 }
 
 .countdown-label {
     font-size: 0.75rem;
     color: var(--ios-gray-1);
     font-weight: 500;
+}
+
+/* Countdown Animation */
+@keyframes countdownChange {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.countdown-changing {
+    animation: countdownChange 0.6s ease-in-out;
 }
 
 /* Progress Section */
@@ -207,6 +223,7 @@ body.ios-theme {
     transition: all 0.2s;
     color: #000;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .action-btn:active {
@@ -259,103 +276,85 @@ body.ios-theme {
     background: var(--ios-red);
 }
 
-/* Tasks Section */
-.tasks-section {
+/* Categories Section */
+.categories-section {
     padding: 0 1rem 2rem;
 }
 
-.category-section {
-    margin-bottom: 1.5rem;
-}
-
-.category-header {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    padding: 0.5rem 0;
-    color: #000;
-    border-bottom: 1px solid var(--ios-gray-5);
-}
-
-.task-item {
+.category-card {
     background: var(--ios-card);
     border-radius: 12px;
     padding: 1rem;
-    margin-bottom: 0.5rem;
-    border-left: 4px solid;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 0.5px solid var(--ios-gray-5);
     transition: all 0.2s;
+    cursor: pointer;
 }
 
-.task-item:active {
+.category-card:active {
     background: var(--ios-gray-5);
+    transform: scale(0.98);
 }
 
-.task-item.ontime {
-    border-left-color: var(--ios-green);
-}
-
-.task-item.almost {
-    border-left-color: var(--ios-orange);
-}
-
-.task-item.late {
-    border-left-color: var(--ios-red);
-}
-
-.task-item.completed {
-    opacity: 0.6;
-}
-
-.task-header {
+.category-header {
     display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
 }
 
-.task-checkbox {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--ios-gray-3);
-    border-radius: 6px;
+.category-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+}
+
+.category-progress {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-top: 0.125rem;
-    flex-shrink: 0;
-    transition: all 0.2s;
+    gap: 0.5rem;
 }
 
-.task-checkbox.checked {
-    background: var(--ios-blue);
-    border-color: var(--ios-blue);
-    color: white;
-}
-
-.task-content {
-    flex: 1;
-}
-
-.task-title {
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    line-height: 1.3;
-}
-
-.task-description {
+.progress-text-small {
     font-size: 0.9rem;
     color: var(--ios-gray-1);
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
 }
 
-.task-footer {
+.progress-bar-container {
+    width: 80px;
+    height: 6px;
+    background: var(--ios-gray-5);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--ios-blue);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.category-description {
+    font-size: 0.9rem;
+    color: var(--ios-gray-1);
+    margin-bottom: 0.75rem;
+}
+
+.category-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.task-status {
+.subtask-count {
+    font-size: 0.8rem;
+    color: var(--ios-gray-1);
+}
+
+.category-status {
     font-size: 0.8rem;
     padding: 0.25rem 0.5rem;
     border-radius: 6px;
@@ -363,16 +362,44 @@ body.ios-theme {
     color: white;
 }
 
-.task-status.ontime {
+.category-status.ontime {
     background: var(--ios-green);
 }
 
-.task-status.almost {
+.category-status.almost {
     background: var(--ios-orange);
 }
 
-.task-status.late {
+.category-status.late {
     background: var(--ios-red);
+}
+
+/* Subtask Items */
+.subtask-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 0.5px solid var(--ios-gray-5);
+}
+
+.subtask-item:last-child {
+    border-bottom: none;
+}
+
+.subtask-info {
+    flex: 1;
+    padding-right: 1rem;
+}
+
+.subtask-name {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.subtask-description {
+    font-size: 0.8rem;
+    color: var(--ios-gray-1);
 }
 
 /* Toggle Switch */
@@ -381,6 +408,7 @@ body.ios-theme {
     display: inline-block;
     width: 50px;
     height: 26px;
+    flex-shrink: 0;
 }
 
 .toggle-switch input {
@@ -411,6 +439,7 @@ body.ios-theme {
     background: white;
     border-radius: 50%;
     transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 input:checked + .toggle-slider {
@@ -446,6 +475,7 @@ input:checked + .toggle-slider:before {
     color: white;
     font-weight: 600;
     transition: all 0.2s;
+    cursor: pointer;
 }
 
 .ios-btn:active {
@@ -491,6 +521,17 @@ input:checked + .toggle-slider:before {
     .stat-number {
         font-size: 1.1rem;
     }
+    
+    .category-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .category-progress {
+        width: 100%;
+        justify-content: space-between;
+    }
 }
 
 /* Animations */
@@ -499,7 +540,7 @@ input:checked + .toggle-slider:before {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.task-item {
+.category-card {
     animation: fadeIn 0.3s ease-out;
 }
 
@@ -511,4 +552,24 @@ input:checked + .toggle-slider:before {
 
 .completed-pulse {
     animation: pulse 0.5s ease;
+}
+
+/* Success Message */
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--ios-green);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Loading State */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
 }
