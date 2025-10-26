@@ -1,498 +1,368 @@
-:root {
-    --primary-blue: #4A90E2;
-    --blue-light: #87CEEB;
-    --blue-lighter: #B0E0E6;
-    --blue-dark: #357ABD;
-    --shadow-light: #ffffff;
-    --shadow-dark: #b8b8b8;
-    --background: #E6E9F0;
-    --text-primary: #2C3E50;
-    --text-secondary: #7F8C8D;
-    --success: #27AE60;
-    --warning: #F39C12;
-    --danger: #E74C3C;
-}
+// N&N Wedding Configuration
+const WEDDING_DATE = new Date(2025, 2, 1); // 1 มีนาคม 2568
+const AUTH_PASSWORD = "1212312121"; // รหัสผ่านใหม่
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body.neumorphism-theme {
-    background: var(--background);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    min-height: 100vh;
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
-    padding: 1rem;
-}
-
-/* Neumorphism Base Styles */
-.neumorphism-card {
-    background: var(--background);
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 
-        8px 8px 16px var(--shadow-dark),
-        -8px -8px 16px var(--shadow-light);
-    border: 1px solid rgba(255,255,255,0.2);
-}
-
-.neumorphism-pressed {
-    background: var(--background);
-    border-radius: 15px;
-    box-shadow: 
-        inset 4px 4px 8px var(--shadow-dark),
-        inset -4px -4px 8px var(--shadow-light);
-}
-
-.neumorphism-input, .neumorphism-select, .neumorphism-textarea {
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    border-radius: 15px;
-    background: var(--background);
-    font-size: 1rem;
-    box-shadow: 
-        inset 4px 4px 8px var(--shadow-dark),
-        inset -4px -4px 8px var(--shadow-light);
-    transition: all 0.3s ease;
-    color: var(--text-primary);
-}
-
-.neumorphism-input:focus, .neumorphism-select:focus, .neumorphism-textarea:focus {
-    outline: none;
-    box-shadow: 
-        inset 6px 6px 12px var(--shadow-dark),
-        inset -6px -6px 12px var(--shadow-light);
-}
-
-.neumorphism-btn {
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 15px;
-    background: var(--primary-blue);
-    color: white;
-    font-weight: 600;
-    box-shadow: 
-        6px 6px 12px var(--shadow-dark),
-        -6px -6px 12px var(--shadow-light);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.neumorphism-btn:active {
-    box-shadow: 
-        inset 4px 4px 8px var(--blue-dark),
-        inset -4px -4px 8px var(--blue-light);
-    transform: scale(0.98);
-}
-
-.neumorphism-modal {
-    border-radius: 25px;
-    border: none;
-    background: var(--background);
-    box-shadow: 
-        12px 12px 24px var(--shadow-dark),
-        -12px -12px 24px var(--shadow-light);
-}
-
-/* App Container */
-.app-container {
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-/* Header */
-.app-header {
-    margin-bottom: 1.5rem;
-}
-
-.header-content {
-    text-align: center;
-    padding: 2rem 1rem;
-}
-
-.app-title {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-    background: linear-gradient(135deg, var(--primary-blue), var(--blue-light));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.app-subtitle {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    margin: 0.5rem 0 0 0;
-}
-
-/* Shimmer Animation */
-@keyframes shimmer {
-    0% { opacity: 0.8; }
-    50% { opacity: 1; }
-    100% { opacity: 0.8; }
-}
-
-.shimmer {
-    animation: shimmer 3s ease-in-out infinite;
-}
-
-/* Countdown Section */
-.countdown-section {
-    margin-bottom: 1.5rem;
-}
-
-.countdown-container {
-    text-align: center;
-}
-
-.countdown-title {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.countdown-display {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.5rem;
-}
-
-.countdown-item {
-    flex: 1;
-    text-align: center;
-}
-
-.countdown-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    padding: 1rem 0.5rem;
-    margin-bottom: 0.5rem;
-    color: var(--primary-blue);
-    border-radius: 15px;
-    min-height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-}
-
-.countdown-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-/* Progress Section */
-.progress-section {
-    margin-bottom: 1.5rem;
-}
-
-.progress-overview {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.progress-circle {
-    position: relative;
-    width: 100px;
-    height: 100px;
-}
-
-.progress-bg {
-    fill: none;
-    stroke: var(--background);
-    stroke-width: 8;
-}
-
-.progress-fill {
-    fill: none;
-    stroke: var(--primary-blue);
-    stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.5s ease;
-    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
-}
-
-.progress-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--primary-blue);
-}
-
-.progress-stats {
-    flex: 1;
-    display: flex;
-    justify-content: space-around;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* Actions Section */
-.actions-section {
-    margin-bottom: 1.5rem;
-}
-
-.action-btn {
-    width: 100%;
-    padding: 1.5rem 1rem;
-    border: none;
-    border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    transition: all 0.3s ease;
-    color: var(--text-primary);
-    text-decoration: none;
-}
-
-.action-btn:active {
-    box-shadow: 
-        inset 4px 4px 8px var(--shadow-dark),
-        inset -4px -4px 8px var(--shadow-light);
-    transform: scale(0.98);
-}
-
-.action-btn i {
-    font-size: 1.5rem;
-    color: var(--primary-blue);
-}
-
-.action-btn span {
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-/* Tasks Section */
-.tasks-section {
-    margin-bottom: 2rem;
-}
-
-.category-card {
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-}
-
-.category-card:active {
-    transform: scale(0.98);
-}
-
-.category-header {
-    display: flex;
-    justify-content: between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.category-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.category-progress {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.progress-text-small {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-.progress-bar-container {
-    flex: 1;
-    height: 8px;
-    background: var(--background);
-    border-radius: 4px;
-    overflow: hidden;
-    box-shadow: 
-        inset 2px 2px 4px var(--shadow-dark),
-        inset -2px -2px 4px var(--shadow-light);
-}
-
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-blue), var(--blue-light));
-    border-radius: 4px;
-    transition: width 0.5s ease;
-    box-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-}
-
-.subtask-count {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* Toggle Switch */
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-}
-
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--background);
-    border-radius: 34px;
-    box-shadow: 
-        inset 4px 4px 8px var(--shadow-dark),
-        inset -4px -4px 8px var(--shadow-light);
-    transition: all 0.3s ease;
-}
-
-.toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 4px;
-    bottom: 4px;
-    background: var(--text-secondary);
-    border-radius: 50%;
-    box-shadow: 
-        2px 2px 4px var(--shadow-dark);
-    transition: all 0.3s ease;
-}
-
-input:checked + .toggle-slider {
-    background: var(--success);
-}
-
-input:checked + .toggle-slider:before {
-    transform: translateX(24px);
-    background: white;
-    box-shadow: 
-        -2px 2px 4px rgba(0,0,0,0.2);
-}
-
-/* Subtask List */
-.subtask-item {
-    display: flex;
-    align-items: center;
-    justify-content: between;
-    padding: 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 15px;
-    background: var(--background);
-    box-shadow: 
-        4px 4px 8px var(--shadow-dark),
-        -4px -4px 8px var(--shadow-light);
-    transition: all 0.3s ease;
-}
-
-.subtask-item:active {
-    box-shadow: 
-        inset 2px 2px 4px var(--shadow-dark),
-        inset -2px -2px 4px var(--shadow-light);
-}
-
-.subtask-info {
-    flex: 1;
-}
-
-.subtask-name {
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-}
-
-.subtask-status {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* Auth Icon */
-.auth-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    color: var(--primary-blue);
-    font-size: 2rem;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .countdown-display {
-        gap: 0.25rem;
-    }
+// Tasks data แบบเรียบง่าย (ไม่มี subtasks)
+const defaultTasks = [
+    // 6 months before (กันยายน 2567)
+    { 
+        id: 1, 
+        name: "กำหนดงบประมาณทั้งหมด", 
+        category: "6", 
+        description: "คำนวณงบประมาณ venue, อาหาร, ชุดแต่งงาน, ของที่ระลึก", 
+        completed: false 
+    },
+    { 
+        id: 2, 
+        name: "จองสถานที่จัดงาน", 
+        category: "6", 
+        description: "สำรวจและจองสถานที่ พร้อมยืนยันจำนวนผู้เข้าร่วม", 
+        completed: false 
+    },
+    { 
+        id: 3, 
+        name: "เลือกและจองชุดแต่งงาน", 
+        category: "6", 
+        description: "ชุดเจ้าสาวและเจ้าบ่าว พร้อมทดลองสวม", 
+        completed: false 
+    },
+    { 
+        id: 4, 
+        name: "จองช่างภาพและวิดีโอ", 
+        category: "6", 
+        description: "สัมภาษณ์และเลือกทีมงานถ่ายภาพ", 
+        completed: false 
+    },
     
-    .countdown-value {
-        font-size: 1.2rem;
-        padding: 0.75rem 0.25rem;
-        min-height: 60px;
-    }
+    // 3 months before (ธันวาคม 2567)
+    { 
+        id: 5, 
+        name: "ออกแบบและสั่งการ์ดเชิญ", 
+        category: "3", 
+        description: "ออกแบบการ์ดเชิญและสั่งพิมพ์", 
+        completed: false 
+    },
+    { 
+        id: 6, 
+        name: "เลือกและจองพวงมาลัย", 
+        category: "3", 
+        description: "ออกแบบพวงมาลัยและจองดอกไม้", 
+        completed: false 
+    },
+    { 
+        id: 7, 
+        name: "วางแผนเมนูอาหาร", 
+        category: "3", 
+        description: "ทดลองชิมและยืนยันเมนูสุดท้าย", 
+        completed: false 
+    },
+    { 
+        id: 8, 
+        name: "จองพาหนะรับส่ง", 
+        category: "3", 
+        description: "รถเจ้าบ่าวและรถรับส่งแขก", 
+        completed: false 
+    },
     
-    .progress-overview {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
+    // 1 month before (กุมภาพันธ์ 2568)
+    { 
+        id: 9, 
+        name: "ส่งการ์ดเชิญ", 
+        category: "1", 
+        description: "ส่งการ์ดเชิญและติดตามการตอบรับ", 
+        completed: false 
+    },
+    { 
+        id: 10, 
+        name: "ยืนยันรายละเอียดกับ Supplier", 
+        category: "1", 
+        description: "ยืนยันเวลากับช่างภาพ, คนถ่ายวิดีโอ, สถานที่", 
+        completed: false 
+    },
+    { 
+        id: 11, 
+        name: "เตรียมของที่ระลึก", 
+        category: "1", 
+        description: "จัดเตรียมและห่อของที่ระลึก", 
+        completed: false 
+    },
     
-    .progress-stats {
-        width: 100%;
-    }
+    // 1 week before (กุมภาพันธ์ 2568)
+    { 
+        id: 12, 
+        name: "ยืนยันจำนวนแขกสุดท้าย", 
+        category: "0.25", 
+        description: "แจ้งจำนวนแขกจริงให้สถานที่และผู้จัดเลี้ยง", 
+        completed: false 
+    },
+    { 
+        id: 13, 
+        name: "ตรวจสอบสภาพอากาศ", 
+        category: "0.25", 
+        description: "เตรียมแผนสำรองหากฝนตก", 
+        completed: false 
+    },
+    { 
+        id: 14, 
+        name: "จ่ายมัดจำส่วนที่เหลือ", 
+        category: "0.25", 
+        description: "ชำระเงิน Supplier ต่างๆ", 
+        completed: false 
+    },
     
-    .app-title {
-        font-size: 1.75rem;
+    // Wedding day (มีนาคม 2568)
+    { 
+        id: 15, 
+        name: "เตรียมชุดแต่งงานและของใช้ส่วนตัว", 
+        category: "0", 
+        description: "ชุดแต่งงาน, แหวน, เอกสาร", 
+        completed: false 
+    },
+    { 
+        id: 16, 
+        name: "พิธีแต่งงานและรับประทานอาหาร", 
+        category: "0", 
+        description: "ดำเนินงานตามกำหนดการ", 
+        completed: false 
+    },
+    { 
+        id: 17, 
+        name: "ถ่ายภาพครอบครัว", 
+        category: "0", 
+        description: "ถ่ายภาพกับครอบครัวและเพื่อนๆ", 
+        completed: false 
+    }
+];
+
+class NNWeddingChecklist {
+    constructor() {
+        this.tasks = this.loadTasks();
+        this.nextId = this.tasks.length > 0 ? Math.max(...this.tasks.map(t => t.id)) + 1 : 18;
+        this.isAuthenticated = false;
+        this.authModal = new bootstrap.Modal(document.getElementById('authModal'));
+        
+        this.initializeEventListeners();
+        this.startCountdown();
+        this.render();
+        this.updateProgress();
+        
+        // Update countdown every second
+        setInterval(() => this.startCountdown(), 1000);
+    }
+
+    initializeEventListeners() {
+        // Auth
+        document.getElementById('authForm').addEventListener('submit', (e) => this.handleAuth(e));
+        
+        // Tasks
+        document.getElementById('addTaskBtn').addEventListener('click', () => this.showAddForm());
+    }
+
+    loadTasks() {
+        const saved = localStorage.getItem('nnWeddingTasks');
+        return saved ? JSON.parse(saved) : defaultTasks;
+    }
+
+    saveTasks() {
+        localStorage.setItem('nnWeddingTasks', JSON.stringify(this.tasks));
+        this.updateProgress();
+    }
+
+    startCountdown() {
+        const now = new Date();
+        const timeDiff = WEDDING_DATE.getTime() - now.getTime();
+        
+        // Calculate time units
+        const months = Math.floor(timeDiff / (1000 * 60 * 60 * 24 * 30.44));
+        const days = Math.floor((timeDiff % (1000 * 60 * 60 * 24 * 30.44)) / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+        
+        // Update display
+        document.getElementById('months').textContent = months;
+        document.getElementById('days').textContent = days;
+        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    }
+
+    updateProgress() {
+        const totalTasks = this.tasks.length;
+        const completedTasks = this.tasks.filter(t => t.completed).length;
+        const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        
+        // Update progress circle
+        const circle = document.querySelector('.progress-fill');
+        const circumference = 226; // 2 * π * 36
+        const offset = circumference - (progressPercent / 100) * circumference;
+        if (circle) {
+            circle.style.strokeDashoffset = offset;
+        }
+        
+        // Update numbers
+        document.getElementById('progressPercent').textContent = progressPercent;
+        document.getElementById('totalTasks').textContent = totalTasks;
+        document.getElementById('completedTasks').textContent = completedTasks;
+        document.getElementById('remainingTasks').textContent = totalTasks - completedTasks;
+    }
+
+    showAddForm() {
+        if (!this.isAuthenticated) {
+            this.authModal.show();
+            return;
+        }
+        // ฟังก์ชันเพิ่มรายการ - ยังไม่ได้ implement
+        alert('ฟังก์ชันเพิ่มรายการ - ต้องล็อกอินก่อน');
+    }
+
+    handleAuth(e) {
+        e.preventDefault();
+        const password = document.getElementById('authPassword').value;
+        
+        if (password === AUTH_PASSWORD) {
+            this.isAuthenticated = true;
+            this.authModal.hide();
+            document.getElementById('authPassword').value = '';
+            alert('ล็อกอินสำเร็จ! ตอนนี้สามารถเพิ่ม/แก้ไขรายการได้');
+        } else {
+            alert('รหัสผ่านไม่ถูกต้อง');
+        }
+    }
+
+    requireAuth(action) {
+        if (!this.isAuthenticated) {
+            this.authModal.show();
+            return false;
+        }
+        return true;
+    }
+
+    toggleTask(id) {
+        const task = this.tasks.find(t => t.id === id);
+        if (task) {
+            task.completed = !task.completed;
+            this.saveTasks();
+            this.render();
+            
+            // Add pulse animation
+            const taskElement = document.querySelector(`[data-task-id="${id}"]`);
+            if (taskElement) {
+                taskElement.classList.add('completed-pulse');
+                setTimeout(() => {
+                    taskElement.classList.remove('completed-pulse');
+                }, 500);
+            }
+        }
+    }
+
+    deleteTask(id) {
+        if (!this.requireAuth()) return;
+        
+        if (confirm('คุณต้องการลบรายการนี้ใช่หรือไม่?')) {
+            this.tasks = this.tasks.filter(t => t.id !== id);
+            this.saveTasks();
+            this.render();
+        }
+    }
+
+    editTask(id) {
+        if (!this.requireAuth()) return;
+        
+        const task = this.tasks.find(t => t.id === id);
+        if (task) {
+            const newName = prompt('แก้ไขชื่อรายการ:', task.name);
+            if (newName !== null && newName.trim() !== '') {
+                task.name = newName;
+                this.saveTasks();
+                this.render();
+            }
+        }
+    }
+
+    calculateStatus(task) {
+        const now = new Date();
+        const dueDate = new Date(WEDDING_DATE);
+        
+        // Calculate due date based on category
+        const monthsBefore = parseFloat(task.category);
+        dueDate.setMonth(dueDate.getMonth() - monthsBefore);
+        
+        const timeDiff = dueDate.getTime() - now.getTime();
+        const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+        
+        if (daysDiff > 30) return 'ontime';
+        if (daysDiff > 0) return 'almost';
+        return 'late';
+    }
+
+    showAllTasks() {
+        this.render();
+    }
+
+    render() {
+        const container = document.getElementById('tasksContainer');
+        const categories = [
+            { id: '6', title: '6 เดือนก่อนงาน (กันยายน 2567)' },
+            { id: '3', title: '3 เดือนก่อนงาน (ธันวาคม 2567)' },
+            { id: '1', title: '1 เดือนก่อนงาน (กุมภาพันธ์ 2568)' },
+            { id: '0.25', title: '1 สัปดาห์ก่อนงาน (กุมภาพันธ์ 2568)' },
+            { id: '0', title: 'วันงาน (1 มีนาคม 2568)' }
+        ];
+
+        let html = '';
+
+        categories.forEach(cat => {
+            const categoryTasks = this.tasks.filter(task => task.category === cat.id);
+            
+            if (categoryTasks.length > 0) {
+                html += `
+                    <div class="category-section">
+                        <div class="category-header">${cat.title}</div>
+                `;
+
+                categoryTasks.forEach(task => {
+                    const status = this.calculateStatus(task);
+                    const statusClass = status;
+                    const statusText = status === 'ontime' ? 'ตามเวลา' : status === 'almost' ? 'ใกล้ถึงกำหนด' : 'เลยกำหนด';
+                    
+                    html += `
+                        <div class="task-item ${statusClass} ${task.completed ? 'completed' : ''}" 
+                             data-task-id="${task.id}">
+                            <div class="task-header">
+                                <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
+                                     onclick="nnWedding.toggleTask(${task.id})">
+                                    ${task.completed ? '✓' : ''}
+                                </div>
+                                <div class="task-content">
+                                    <div class="task-title">${task.name}</div>
+                                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="task-footer">
+                                <span class="task-status ${statusClass}">${statusText}</span>
+                                <div class="task-actions">
+                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                            onclick="event.stopPropagation(); nnWedding.editTask(${task.id})">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="event.stopPropagation(); nnWedding.deleteTask(${task.id})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            }
+        });
+
+        container.innerHTML = html;
     }
 }
 
-/* Pulse Animation for Completed Tasks */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.completed-pulse {
-    animation: pulse 0.5s ease;
-}
-
-/* Smooth Transitions */
-* {
-    transition: color 0.3s ease, background-color 0.3s ease;
-}
+// Initialize the application
+const nnWedding = new NNWeddingChecklist();
